@@ -1,1745 +1,880 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard – Thầy Du Gia Văn</title>
+  <title>Dashboard Giáo Viên – Thầy Du Gia Văn</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-
-    /* ══ DESIGN TOKENS ══ */
+    /* ══ GHIBLI DESIGN TOKENS ══ */
     :root {
-      /* 🍏 Nền tảng màu sắc - Apple System Colors */
-      --bg: #f5f5f7;
-      /* Silver foil - Chuẩn Macbook */
-      --surface: #ffffff;
-      --surface2: rgba(245, 245, 247, 0.8);
-
-      /* 🌫️ Hiệu ứng kính (SF Pro Translucency) */
-      --glass: rgba(255, 255, 255, 0.72);
-      --glass-border: rgba(255, 255, 255, 0.4);
-      --sep: rgba(0, 0, 0, 0.06);
-      /* Đường kẻ mỏng như sợi tóc */
-
-      /* 🌑 Đổ bóng Layered (Quan trọng nhất để tạo độ sang) */
-      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
-      --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.02);
-
-      /* 🔵 Apple Blue & Semantic Colors */
-      --accent: #007AFF;
-      /* Màu xanh iOS chuẩn */
-      --accent-hover: #0063cc;
-      --accent-light: rgba(0, 122, 255, 0.1);
-      --success: #28cd41;
-      /* Green tinh tế hơn */
-      --danger: #ff3b30;
-      --warning: #ff9500;
-      --purple: #af52de;
-
-      /* 🖋️ Typography (Apple dùng chữ đen Charcoal, không phải đen kịt) */
-      --text: #1d1d1f;
-      /* Ink Black */
-      --text2: #424245;
-      /* Body text */
-      --muted: #86868b;
-      /* Secondary */
-      --muted2: #a1a1a6;
-      /* Tertiary */
-
-      /* 📐 Bo góc (Apple Squircle - mượt hơn bo tròn thường) */
-      --radius: 20px;
-      /* Cho Dashboard Card */
-      --radius-sm: 12px;
-      /* Cho Item/Button */
-      --radius-xs: 8px;
-      /* Cho Mini Badge */
-
-      /* 🏎️ Motion (Hệ số nội suy của Apple rất mượt) */
-      --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-      --transition: 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      --sky-top: #87ceeb;
+      --sky-mid: #b0e2ff;
+      --sky-bottom: #e0f6ff;
+      --card: rgba(255, 253, 250, 0.96);
+      --card-border: rgba(255,255,255,0.85);
+      --sky-blue: #6fc2e9;
+      --sky-blue-dark: #4a9fc8;
+      --grass: #7ec8a0;
+      --grass-dark: #5aab82;
+      --peach: #ffb7a0;
+      --honey: #ffd580;
+      --lavender: #c9b8f0;
+      --text: #3a4a5c;
+      --text2: #5a6a7c;
+      --muted: #8fa0b0;
+      --sep: rgba(110,170,210,0.18);
+      --surface: rgba(255,253,250,0.92);
+      --success: #5aab82;
+      --warning: #e8a040;
+      --danger: #e07070;
+      --radius: 22px;
+      --radius-sm: 14px;
+      --radius-xs: 9px;
+      --shadow: 0 8px 30px rgba(100,160,200,0.13), 0 2px 8px rgba(100,160,200,0.08);
+      --shadow-lg: 0 16px 50px rgba(80,130,180,0.16), 0 4px 16px rgba(100,160,200,0.10);
+      --font-main: 'Plus Jakarta Sans', sans-serif;
+      --font-cute: 'Quicksand', sans-serif;
+      --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
     }
-
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html,
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: var(--font-main); color: var(--text); -webkit-font-smoothing: antialiased; }
     body {
-      height: 100%;
-      font-family: var(--font);
-      color: var(--text);
-      -webkit-font-smoothing: antialiased;
+      background: linear-gradient(160deg, var(--sky-top) 0%, var(--sky-mid) 35%, var(--sky-bottom) 65%, #f0fbff 100%);
+      min-height: 100vh;
+      background-attachment: fixed;
     }
 
-    body {
-      background: var(--bg);
-      overflow-x: hidden;
+    /* ── Floating clouds deco ── */
+    body::before {
+      content: '';
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        radial-gradient(ellipse 180px 80px at 15% 12%, rgba(255,255,255,0.45) 0%, transparent 70%),
+        radial-gradient(ellipse 240px 90px at 72% 8%, rgba(255,255,255,0.38) 0%, transparent 70%),
+        radial-gradient(ellipse 160px 60px at 45% 22%, rgba(255,255,255,0.3) 0%, transparent 70%),
+        radial-gradient(ellipse 300px 120px at 90% 18%, rgba(255,255,255,0.25) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
     }
 
     /* ══ LAYOUT ══ */
-    .app {
-      display: flex;
-      min-height: 100vh;
-    }
+    .app { display: flex; min-height: 100vh; position: relative; z-index: 1; }
 
     /* ── Sidebar ── */
     .sidebar {
-      width: 240px;
-      flex-shrink: 0;
-      background: var(--surface);
-      border-right: 1px solid var(--sep);
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      z-index: 100;
-      padding: 1.5rem 1rem;
-      box-shadow: var(--shadow-sm);
+      width: 220px; flex-shrink: 0;
+      background: var(--card);
+      border-right: 2px solid var(--card-border);
+      box-shadow: 4px 0 20px rgba(100,160,200,0.10);
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; bottom: 0;
+      z-index: 100; padding: 1.4rem .9rem;
+      backdrop-filter: blur(16px);
     }
-
     .sidebar-logo {
-      display: flex;
-      align-items: center;
-      gap: .65rem;
-      padding: .5rem .75rem 1.5rem;
-      border-bottom: 1px solid var(--sep);
-      margin-bottom: 1rem;
+      display: flex; align-items: center; gap: .6rem;
+      padding: .4rem .5rem 1.3rem;
+      border-bottom: 1.5px solid var(--sep);
+      margin-bottom: .9rem;
     }
-
     .sidebar-logo-icon {
-      width: 36px;
-      height: 36px;
-      background: var(--accent);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      flex-shrink: 0;
-      box-shadow: 0 3px 10px rgba(0, 113, 227, .3);
+      width: 38px; height: 38px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--sky-blue), var(--sky-blue-dark));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(111,194,233,0.38);
     }
-
     .sidebar-logo-text {
-      font-size: .82rem;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.25;
-      letter-spacing: -.01em;
+      font-family: var(--font-cute); font-size: .86rem; font-weight: 700;
+      color: var(--text); line-height: 1.2;
     }
-
-    .sidebar-logo-sub {
-      font-size: .65rem;
-      color: var(--muted);
-      font-weight: 500;
-    }
-
-    .sidebar-nav {
-      display: flex;
-      flex-direction: column;
-      gap: .25rem;
-      flex: 1;
-    }
-
+    .sidebar-logo-sub { font-size: .62rem; color: var(--muted); font-weight: 600; }
+    .sidebar-nav { display: flex; flex-direction: column; gap: .22rem; flex: 1; }
     .nav-item {
-      display: flex;
-      align-items: center;
-      gap: .65rem;
-      padding: .6rem .85rem;
-      border-radius: var(--radius-sm);
-      font-size: .82rem;
-      font-weight: 600;
-      color: var(--muted2);
-      cursor: pointer;
-      transition: var(--transition);
-      border: none;
-      background: none;
-      text-align: left;
-      width: 100%;
+      display: flex; align-items: center; gap: .6rem;
+      padding: .6rem .85rem; border-radius: var(--radius-sm);
+      font-size: .8rem; font-weight: 600; color: var(--text2);
+      cursor: pointer; transition: var(--transition);
+      border: none; background: none; text-align: left; width: 100%;
+      font-family: var(--font-main);
     }
-
-    .nav-item:hover {
-      background: var(--surface2);
-      color: var(--text);
-    }
-
+    .nav-item:hover { background: rgba(111,194,233,0.12); color: var(--sky-blue-dark); }
     .nav-item.active {
-      background: var(--accent-light);
-      color: var(--accent);
+      background: linear-gradient(90deg, rgba(111,194,233,0.18), rgba(111,194,233,0.06));
+      color: var(--sky-blue-dark);
+      border-left: 3px solid var(--sky-blue);
+      padding-left: calc(.85rem - 3px);
     }
-
-    .nav-item-icon {
-      font-size: 1rem;
-      width: 20px;
-      text-align: center;
-      flex-shrink: 0;
-    }
-
-    .nav-label {
-      flex: 1;
-    }
-
+    .nav-item-icon { font-size: .98rem; width: 20px; text-align: center; flex-shrink: 0; }
+    .nav-label { flex: 1; }
     .nav-badge {
-      background: var(--accent);
-      color: #fff;
-      border-radius: 50px;
-      padding: .08rem .45rem;
-      font-size: .6rem;
-      font-weight: 800;
-      min-width: 18px;
-      text-align: center;
+      background: linear-gradient(135deg, var(--sky-blue), var(--sky-blue-dark));
+      color: #fff; border-radius: 50px;
+      padding: .06rem .42rem; font-size: .6rem; font-weight: 800;
     }
-
     .sidebar-footer {
-      padding-top: 1rem;
-      border-top: 1px solid var(--sep);
-      font-size: .65rem;
-      color: var(--muted);
-      text-align: center;
-      font-weight: 500;
-      line-height: 1.5;
+      padding-top: .9rem; border-top: 1.5px solid var(--sep);
+      font-size: .63rem; color: var(--muted); text-align: center;
+      font-weight: 600; line-height: 1.6; font-family: var(--font-cute);
     }
-
-    .sidebar-footer strong {
-      color: var(--accent);
-    }
+    .sidebar-footer strong { color: var(--sky-blue-dark); }
 
     /* ── Main ── */
-    .main {
-      margin-left: 240px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+    .main { margin-left: 220px; flex: 1; display: flex; flex-direction: column; }
 
-    /* ── Header - Apple Glass Navigation ── */
+    /* ── Header ── */
     .header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      /* Sử dụng biến --glass đã định nghĩa để đồng bộ độ mờ */
-      background: var(--glass);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      /* Đường kẻ siêu mảnh (Hairline) chuẩn Apple */
-      border-bottom: 0.5px solid var(--sep);
-      padding: 0.75rem 2rem;
-      /* Giảm nhẹ padding để thanh lịch hơn */
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      /* Hiệu ứng bóng đổ nhẹ phía dưới khi cuộn */
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(224,246,255,0.82);
+      backdrop-filter: blur(20px);
+      border-bottom: 1.5px solid rgba(111,194,233,0.2);
+      padding: .8rem 1.8rem;
+      display: flex; align-items: center; gap: 1rem;
     }
-
+    .header-icon { font-size: 1.4rem; }
     .header-title {
-      font-size: 1.05rem;
-      /* Giảm nhẹ size để trông hiện đại hơn */
-      font-weight: 700;
-      /* Apple hiếm khi dùng 800 cho tiêu đề nhỏ */
-      letter-spacing: -0.02em;
-      /* Độ khít vừa phải cho Plus Jakarta Sans */
-      flex: 1;
-      color: var(--text);
-      line-height: 1.2;
+      font-family: var(--font-cute); font-size: 1.1rem; font-weight: 700;
+      color: var(--text); flex: 1;
     }
-
-    .header-subtitle {
-      font-size: 0.68rem;
-      /* Nhỏ hơn một chút */
-      font-weight: 500;
-      color: var(--muted);
-      margin-top: 0.1rem;
-      text-transform: none;
-      /* Giữ nguyên chữ thường cho cảm giác mềm mại */
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      /* Tăng khoảng cách các nút bên phải */
-    }
-
+    .header-subtitle { font-size: .68rem; font-weight: 600; color: var(--muted); margin-top: .05rem; }
+    .header-right { display: flex; align-items: center; gap: .7rem; }
     .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: .4rem;
-      padding: .55rem 1rem;
-      border-radius: 50px;
-      font-family: var(--font);
-      font-size: .8rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: var(--transition);
-      border: none;
+      display: inline-flex; align-items: center; gap: .35rem;
+      padding: .5rem .95rem; border-radius: 50px;
+      font-family: var(--font-main); font-size: .78rem; font-weight: 700;
+      cursor: pointer; transition: var(--transition); border: 1.5px solid transparent;
     }
-
     .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 3px 12px rgba(0, 113, 227, .25);
+      background: linear-gradient(135deg, var(--sky-blue), var(--sky-blue-dark));
+      color: #fff; border-color: transparent;
+      box-shadow: 0 4px 16px rgba(111,194,233,0.35);
     }
-
-    .btn-primary:hover {
-      background: var(--accent-hover);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 18px rgba(0, 113, 227, .32);
-    }
-
-    .btn-primary:active {
-      transform: none;
-    }
-
-    .btn-ghost {
-      background: var(--surface);
-      color: var(--text2);
-      border: 1px solid var(--sep);
-    }
-
-    .btn-ghost:hover {
-      background: var(--surface2);
-    }
-
-    .btn:disabled {
-      opacity: .55;
-      cursor: not-allowed;
-      transform: none !important;
-    }
-
-    .last-refresh {
-      font-size: .7rem;
-      color: var(--muted);
-      font-weight: 500;
-    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(111,194,233,0.42); }
+    .btn-primary:active { transform: none; }
+    .btn-ghost { background: var(--card); color: var(--text2); border-color: var(--sep); }
+    .btn-ghost:hover { background: rgba(111,194,233,0.1); border-color: var(--sky-blue); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; transform: none !important; }
+    .last-refresh { font-size: .68rem; color: var(--muted); font-weight: 600; }
 
     /* ── Content ── */
-    .content {
-      flex: 1;
-      padding: 1.75rem 2rem 3rem;
-    }
+    .content { flex: 1; padding: 1.5rem 1.8rem 3rem; }
 
     /* ── View Sections ── */
-    .view {
-      display: none;
+    .view { display: none; }
+    .view.active { display: block; animation: floatUp .35s ease; }
+    @keyframes floatUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    .view.active {
-      display: block;
-      animation: fadeUp .3s ease;
+    /* ── Ghibli Card ── */
+    .g-card {
+      background: var(--card);
+      border: 2px solid var(--card-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
     }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+    .g-card:hover { box-shadow: var(--shadow-lg); }
 
     /* ── Stats Grid ── */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.25rem;
-      /* Tăng khoảng cách để thở tốt hơn */
-      margin-bottom: 2rem;
-    }
-
+    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: .9rem; margin-bottom: 1.3rem; }
     .stat-card {
-      background: var(--surface);
-      /* Đường viền siêu mảnh chuẩn Retina */
-      border: 0.5px solid var(--sep);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      /* Padding rộng rãi cho sang */
-      box-shadow: var(--shadow-sm);
-      position: relative;
-      overflow: hidden;
-      transition: var(--transition);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      background: var(--card); border: 2px solid var(--card-border);
+      border-radius: var(--radius); padding: 1.1rem 1.2rem;
+      box-shadow: var(--shadow); transition: var(--transition);
+      position: relative; overflow: hidden;
     }
-
-    .stat-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
+    .stat-card:hover { transform: translateY(-3px) rotate(-0.3deg); box-shadow: var(--shadow-lg); }
+    .stat-card::before {
+      content: ''; position: absolute;
+      top: -30px; right: -30px;
+      width: 90px; height: 90px; border-radius: 50%; opacity: .07;
     }
-
-    .stat-card::after {
-      content: '';
-      position: absolute;
-      top: -20px;
-      right: -20px;
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      opacity: .07;
-    }
-
-    .stat-card.blue::after {
-      background: var(--accent);
-    }
-
-    .stat-card.green::after {
-      background: var(--success);
-    }
-
-    .stat-card.red::after {
-      background: var(--danger);
-    }
-
-    .stat-card.purple::after {
-      background: var(--purple);
-    }
-
-    .stat-icon {
-      font-size: 1.4rem;
-      margin-bottom: .5rem;
-      display: block;
-    }
-
+    .stat-card.blue::before  { background: var(--sky-blue); }
+    .stat-card.green::before { background: var(--grass); }
+    .stat-card.peach::before { background: var(--peach); }
+    .stat-card.honey::before { background: var(--honey); }
+    .stat-icon { font-size: 1.5rem; margin-bottom: .45rem; display: block; }
     .stat-val {
-      font-size: 2rem;
-      font-weight: 800;
-      letter-spacing: -.05em;
-      line-height: 1;
-      color: var(--text);
+      font-family: var(--font-cute); font-size: 1.9rem; font-weight: 700;
+      letter-spacing: -.04em; line-height: 1; color: var(--text);
     }
-
-    .stat-lbl {
-      font-size: .72rem;
-      font-weight: 600;
-      color: var(--muted);
-      margin-top: .3rem;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-    }
-
-    .stat-trend {
-      font-size: .7rem;
-      font-weight: 600;
-      margin-top: .4rem;
-    }
-
-    .stat-trend.up {
-      color: var(--success);
-    }
-
-    .stat-trend.down {
-      color: var(--danger);
-    }
-
-    .stat-trend.neutral {
-      color: var(--muted);
-    }
+    .stat-lbl { font-size: .68rem; font-weight: 700; color: var(--muted); margin-top: .28rem; text-transform: uppercase; letter-spacing: .06em; }
+    .stat-trend { font-size: .68rem; font-weight: 600; margin-top: .35rem; }
+    .stat-trend.up   { color: var(--success); }
+    .stat-trend.down { color: var(--danger); }
+    .stat-trend.neutral { color: var(--muted); }
 
     /* ── Charts Row ── */
-    .charts-row {
-      display: grid;
-      grid-template-columns: 1.6fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
+    .charts-row { display: grid; grid-template-columns: 1.6fr 1fr; gap: .9rem; margin-bottom: 1.3rem; }
     .chart-card {
-      background: var(--surface);
-      border: 1px solid var(--sep);
-      border-radius: var(--radius);
-      padding: 1.3rem 1.5rem;
-      box-shadow: var(--shadow-sm);
+      background: var(--card); border: 2px solid var(--card-border);
+      border-radius: var(--radius); padding: 1.2rem 1.4rem;
+      box-shadow: var(--shadow); transition: var(--transition);
     }
+    .chart-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem; }
+    .chart-title { font-family: var(--font-cute); font-size: .88rem; font-weight: 700; color: var(--text); }
+    .chart-subtitle { font-size: .66rem; color: var(--muted); font-weight: 600; margin-top: .08rem; }
+    .chart-wrap { position: relative; height: 200px; }
 
-    .chart-card-full {
-      grid-column: 1 / -1;
-    }
+    /* ── Section header ── */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .section-title { font-family: var(--font-cute); font-size: 1rem; font-weight: 700; color: var(--text); }
+    .section-sub { font-size: .68rem; color: var(--muted); font-weight: 600; margin-top: .1rem; }
 
-    .chart-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.1rem;
-    }
-
-    .chart-title {
-      font-size: .88rem;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -.02em;
-    }
-
-    .chart-subtitle {
-      font-size: .68rem;
-      color: var(--muted);
-      font-weight: 500;
-      margin-top: .1rem;
-    }
-
-    .chart-wrap {
-      position: relative;
-      height: 220px;
-    }
-
-    .chart-wrap.tall {
-      height: 280px;
-    }
-
-    /* ── Top students mini list ── */
-    .top-list {
-      display: flex;
-      flex-direction: column;
-      gap: .5rem;
-      margin-top: .5rem;
-    }
-
+    /* ── Top students ── */
+    .top-list { display: flex; flex-direction: column; gap: .42rem; margin-top: .35rem; }
     .top-item {
-      display: flex;
-      align-items: center;
-      gap: .75rem;
-      padding: .6rem .8rem;
-      border-radius: var(--radius-sm);
-      background: var(--surface2);
-      transition: var(--transition);
+      display: flex; align-items: center; gap: .65rem;
+      padding: .55rem .75rem; border-radius: var(--radius-sm);
+      background: rgba(111,194,233,0.07);
+      border: 1.5px solid rgba(111,194,233,0.12);
+      transition: var(--transition); cursor: pointer;
     }
-
-    .top-item:hover {
-      background: var(--accent-light);
-    }
-
-    .top-rank {
-      font-size: .82rem;
-      font-weight: 800;
-      min-width: 22px;
-      text-align: center;
-    }
-
-    .top-rank.g1 {
-      color: #f0a500;
-    }
-
-    .top-rank.g2 {
-      color: #8e9aab;
-    }
-
-    .top-rank.g3 {
-      color: #c07a3e;
-    }
-
-    .top-rank.gn {
-      color: var(--muted);
-    }
-
+    .top-item:hover { background: rgba(111,194,233,0.15); border-color: rgba(111,194,233,0.3); transform: translateX(4px); }
+    .top-rank { font-family: var(--font-cute); font-size: .82rem; font-weight: 700; min-width: 20px; text-align: center; }
+    .top-rank.g1 { color: #e8a040; font-size: 1rem; }
+    .top-rank.g2 { color: #8e9aab; }
+    .top-rank.g3 { color: #c07a3e; }
+    .top-rank.gn { color: var(--muted); }
     .top-avatar {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: var(--accent-light);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: .75rem;
-      font-weight: 800;
-      color: var(--accent);
-      flex-shrink: 0;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--sky-mid), var(--sky-blue));
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-cute); font-size: .7rem; font-weight: 700;
+      color: #fff; flex-shrink: 0; border: 1.5px solid rgba(255,255,255,0.7);
     }
-
-    .top-name {
-      flex: 1;
-      font-size: .8rem;
-      font-weight: 600;
-      color: var(--text);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .top-meta {
-      font-size: .65rem;
-      color: var(--muted);
-      font-weight: 500;
-    }
-
-    .top-score {
-      font-size: .82rem;
-      font-weight: 800;
-      color: var(--accent);
-      white-space: nowrap;
-    }
+    .top-name { flex: 1; font-size: .78rem; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .top-meta { font-size: .62rem; color: var(--muted); font-weight: 500; }
+    .top-score { font-family: var(--font-cute); font-size: .82rem; font-weight: 700; color: var(--sky-blue-dark); }
 
     /* ── Table ── */
     .table-card {
-      background: var(--surface);
-      border: 1px solid var(--sep);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-sm);
+      background: var(--card); border: 2px solid var(--card-border);
+      border-radius: var(--radius); box-shadow: var(--shadow);
       overflow: hidden;
     }
-
     .table-toolbar {
-      padding: 1rem 1.4rem;
-      border-bottom: 1px solid var(--sep);
-      display: flex;
-      align-items: center;
-      gap: .75rem;
-      flex-wrap: wrap;
+      padding: .9rem 1.3rem; border-bottom: 1.5px solid var(--sep);
+      display: flex; align-items: center; gap: .65rem; flex-wrap: wrap;
     }
-
-    .table-title {
-      font-size: .9rem;
-      font-weight: 700;
-      color: var(--text);
-      flex: 1;
-      letter-spacing: -.02em;
-    }
-
-    .search-wrap {
-      position: relative;
-    }
-
+    .table-title { font-family: var(--font-cute); font-size: .9rem; font-weight: 700; color: var(--text); flex: 1; }
+    .search-wrap { position: relative; }
     .search-wrap input {
-      padding: .5rem .9rem .5rem 2.2rem;
+      padding: .45rem .85rem .45rem 2.1rem;
       border-radius: 50px;
-      border: 1px solid var(--sep);
-      background: var(--surface2);
-      font-family: var(--font);
-      font-size: .8rem;
-      font-weight: 500;
-      color: var(--text);
-      outline: none;
-      transition: var(--transition);
-      width: 200px;
+      border: 1.5px solid rgba(111,194,233,0.3);
+      background: rgba(224,246,255,0.5);
+      font-family: var(--font-main); font-size: .78rem; font-weight: 600;
+      color: var(--text); outline: none; transition: var(--transition); width: 190px;
     }
-
-    .search-wrap input:focus {
-      border-color: var(--accent);
-      background: var(--surface);
-      box-shadow: 0 0 0 3px rgba(0, 113, 227, .1);
-      width: 240px;
-    }
-
-    .search-wrap::before {
-      content: '🔍';
-      position: absolute;
-      left: .75rem;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: .7rem;
-      pointer-events: none;
-    }
-
+    .search-wrap input:focus { border-color: var(--sky-blue); background: rgba(255,253,250,0.95); box-shadow: 0 0 0 3px rgba(111,194,233,0.14); width: 220px; }
+    .search-wrap::before { content: '🔍'; position: absolute; left: .7rem; top: 50%; transform: translateY(-50%); font-size: .68rem; pointer-events: none; }
     .filter-select {
-      padding: .48rem .8rem;
-      border-radius: 50px;
-      border: 1px solid var(--sep);
-      background: var(--surface2);
-      font-family: var(--font);
-      font-size: .78rem;
-      font-weight: 600;
-      color: var(--text2);
-      outline: none;
-      cursor: pointer;
+      padding: .43rem .75rem; border-radius: 50px;
+      border: 1.5px solid rgba(111,194,233,0.25);
+      background: rgba(224,246,255,0.5);
+      font-family: var(--font-main); font-size: .76rem; font-weight: 600;
+      color: var(--text2); outline: none; cursor: pointer; transition: var(--transition);
     }
-
-    .filter-select:focus {
-      border-color: var(--accent);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
+    .filter-select:focus { border-color: var(--sky-blue); }
+    table { width: 100%; border-collapse: collapse; }
     thead th {
-      padding: .65rem 1.2rem;
-      text-align: left;
-      font-size: .68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      color: var(--muted);
-      background: var(--surface2);
-      border-bottom: 1px solid var(--sep);
-      white-space: nowrap;
-      cursor: pointer;
-      user-select: none;
-      transition: var(--transition);
+      padding: .6rem 1.1rem; text-align: left;
+      font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+      color: var(--muted); background: rgba(224,246,255,0.6);
+      border-bottom: 1.5px solid var(--sep); white-space: nowrap;
+      cursor: pointer; user-select: none; transition: var(--transition);
+      font-family: var(--font-cute);
     }
-
-    thead th:hover {
-      color: var(--accent);
-    }
-
-    thead th.sorted-asc::after {
-      content: ' ↑';
-      color: var(--accent);
-    }
-
-    thead th.sorted-desc::after {
-      content: ' ↓';
-      color: var(--accent);
-    }
-
-    tbody tr {
-      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-      transition: var(--transition);
-      cursor: pointer;
-    }
-
-    tbody tr:last-child {
-      border-bottom: none;
-    }
-
-    tbody tr:hover {
-      background: rgba(0, 113, 227, .03);
-    }
-
-    tbody td {
-      padding: .72rem 1.2rem;
-      font-size: .82rem;
-      color: var(--text2);
-    }
-
-    tbody td:first-child {
-      font-weight: 600;
-      color: var(--text);
-    }
-
+    thead th:hover { color: var(--sky-blue-dark); }
+    tbody tr { border-bottom: 1px solid rgba(111,194,233,0.08); transition: var(--transition); cursor: pointer; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(111,194,233,0.06); }
+    tbody td { padding: .68rem 1.1rem; font-size: .8rem; color: var(--text2); }
+    tbody td:first-child { font-weight: 600; color: var(--text); }
     .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: .22rem .6rem;
-      border-radius: 50px;
-      font-size: .68rem;
-      font-weight: 700;
+      display: inline-flex; align-items: center;
+      padding: .2rem .55rem; border-radius: 50px;
+      font-size: .66rem; font-weight: 700; font-family: var(--font-cute);
     }
+    .badge-success { background: rgba(90,171,130,0.14); color: var(--success); border: 1px solid rgba(90,171,130,0.25); }
+    .badge-warning { background: rgba(232,160,64,0.12); color: var(--warning); border: 1px solid rgba(232,160,64,0.22); }
+    .badge-danger  { background: rgba(224,112,112,0.12); color: var(--danger);  border: 1px solid rgba(224,112,112,0.22); }
+    .pct-bar { display: flex; align-items: center; gap: .45rem; }
+    .pct-track { flex: 1; height: 5px; background: rgba(111,194,233,0.15); border-radius: 50px; overflow: hidden; min-width: 48px; }
+    .pct-fill { height: 100%; border-radius: 50px; transition: width .8s ease; }
+    .pct-num { font-family: var(--font-cute); font-size: .74rem; font-weight: 700; min-width: 34px; text-align: right; }
 
-    .badge-success {
-      background: rgba(52, 199, 89, .12);
-      color: #28a745;
-    }
-
-    .badge-warning {
-      background: rgba(255, 149, 0, .12);
-      color: #d47f00;
-    }
-
-    .badge-danger {
-      background: rgba(255, 59, 48, .12);
-      color: #cc2f26;
-    }
-
-    .pct-bar {
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-    }
-
-    .pct-track {
-      flex: 1;
-      height: 5px;
-      background: rgba(0, 0, 0, .07);
-      border-radius: 50px;
-      overflow: hidden;
-      min-width: 50px;
-    }
-
-    .pct-fill {
-      height: 100%;
-      border-radius: 50px;
-      transition: width .6s ease;
-    }
-
-    .pct-num {
-      font-size: .75rem;
-      font-weight: 700;
-      min-width: 34px;
-      text-align: right;
-    }
-
-    /* ── Student Detail Modal ── */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 1000;
-      background: rgba(0, 0, 0, .35);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .25s ease;
-    }
-
-    .modal-overlay.open {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .modal {
-      background: var(--surface);
-      border-radius: 24px;
-      width: 100%;
-      max-width: 720px;
-      max-height: 88vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      box-shadow: var(--shadow-lg);
-      border: 1px solid var(--sep);
-      transform: scale(.96);
-      transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
-    }
-
-    .modal-overlay.open .modal {
-      transform: scale(1);
-    }
-
-    .modal-header {
-      padding: 1.4rem 1.8rem 1rem;
-      border-bottom: 1px solid var(--sep);
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      flex-shrink: 0;
-    }
-
-    .modal-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      background: var(--accent-light);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--accent);
-      flex-shrink: 0;
-    }
-
-    .modal-name {
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: var(--text);
-      letter-spacing: -.03em;
-    }
-
-    .modal-meta {
-      font-size: .75rem;
-      color: var(--muted);
-      font-weight: 500;
-      margin-top: .15rem;
-    }
-
-    .modal-close {
-      margin-left: auto;
-      background: var(--surface2);
-      border: none;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      font-size: .85rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: var(--transition);
-      color: var(--muted2);
-      flex-shrink: 0;
-    }
-
-    .modal-close:hover {
-      background: rgba(255, 59, 48, .1);
-      color: var(--danger);
-    }
-
-    .modal-stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: .65rem;
-      padding: 1rem 1.8rem;
-      flex-shrink: 0;
-      border-bottom: 1px solid var(--sep);
-    }
-
-    .mstat {
-      text-align: center;
-      padding: .65rem;
-      background: var(--surface2);
-      border-radius: var(--radius-sm);
-    }
-
-    .mstat-val {
-      font-size: 1.3rem;
-      font-weight: 800;
-      letter-spacing: -.04em;
-    }
-
-    .mstat-lbl {
-      font-size: .62rem;
-      color: var(--muted);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-      margin-top: .15rem;
-    }
-
-    .modal-body {
-      overflow-y: auto;
-      padding: 1rem 1.8rem 1.5rem;
-      flex: 1;
-    }
-
-    .modal-section-title {
-      font-size: .72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--muted);
-      margin-bottom: .65rem;
-    }
-
-    .session-item {
-      border: 1px solid var(--sep);
-      border-radius: var(--radius-sm);
-      margin-bottom: .65rem;
-      overflow: hidden;
-    }
-
-    .session-head {
-      display: flex;
-      align-items: center;
-      gap: .75rem;
-      padding: .75rem 1rem;
-      cursor: pointer;
-      transition: var(--transition);
-      background: var(--surface2);
-    }
-
-    .session-head:hover {
-      background: rgba(0, 113, 227, .04);
-    }
-
-    .session-emoji {
-      font-size: 1.1rem;
-    }
-
-    .session-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .session-lesson {
-      font-size: .82rem;
-      font-weight: 700;
-      color: var(--text);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .session-meta-row {
-      font-size: .67rem;
-      color: var(--muted);
-      font-weight: 500;
-      margin-top: .1rem;
-    }
-
-    .session-pct {
-      font-size: 1rem;
-      font-weight: 800;
-    }
-
-    .session-frac {
-      font-size: .65rem;
-      color: var(--muted);
-      text-align: right;
-    }
-
-    .session-chevron {
-      font-size: .7rem;
-      color: var(--muted);
-      transition: transform .2s;
-    }
-
-    .session-item.expanded .session-chevron {
-      transform: rotate(180deg);
-    }
-
-    .session-questions {
-      display: none;
-      padding: .75rem 1rem;
-      border-top: 1px solid var(--sep);
-    }
-
-    .session-item.expanded .session-questions {
-      display: block;
-    }
-
-    .q-row {
-      display: flex;
-      gap: .6rem;
-      padding: .5rem .6rem;
-      border-radius: var(--radius-xs);
-      margin-bottom: .4rem;
-      font-size: .75rem;
-    }
-
-    .q-row.correct {
-      background: rgba(52, 199, 89, .07);
-    }
-
-    .q-row.wrong {
-      background: rgba(255, 59, 48, .07);
-    }
-
-    /* ── Question & Answer Detail - Apple Editorial Style ── */
-    .q-badge {
-      padding: 0.2rem 0.5rem;
-      border-radius: 6px;
-      /* Tăng nhẹ độ bo cho mượt mắt */
-      font-size: 0.62rem;
-      font-weight: 700;
-      flex-shrink: 0;
-      margin-top: 0.15rem;
-      text-transform: uppercase;
-      letter-spacing: 0.02em;
-    }
-
-    /* Màu xanh chuẩn iOS Success */
-    .q-badge.c {
-      background: rgba(52, 199, 89, 0.12);
-      color: #248a3d;
-    }
-
-    /* Màu đỏ chuẩn iOS Danger */
-    .q-badge.w {
-      background: rgba(255, 59, 48, 0.1);
-      color: #ff3b30;
-    }
-
-    .q-content {
-      flex: 1;
-      padding-left: 0.25rem;
-      /* Tạo khoảng trống nhỏ với badge */
-    }
-
-    .q-text {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.25rem;
-      line-height: 1.5;
-      letter-spacing: -0.01em;
-    }
-
-    .q-ans {
-      font-size: 0.78rem;
-      color: var(--muted2);
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    /* Thêm một dấu chấm nhỏ ngăn cách nếu cần hoặc icon nhẹ */
-    .q-ans::before {
-      content: "↳";
-      opacity: 0.5;
-      font-family: serif;
-    }
-
-    /* ── Grammar Points ── */
-    .grammar-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: .75rem;
-      margin-top: .5rem;
-    }
-
+    /* ── Grammar Grid ── */
+    .grammar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); gap: .7rem; }
     .grammar-chip {
-      background: var(--surface);
-      border: 1px solid var(--sep);
-      border-radius: var(--radius-sm);
-      padding: .9rem 1rem;
-      box-shadow: var(--shadow-sm);
-      transition: var(--transition);
+      background: var(--card); border: 2px solid var(--card-border);
+      border-radius: var(--radius-sm); padding: .85rem .95rem;
+      box-shadow: var(--shadow); transition: var(--transition);
+    }
+    .grammar-chip:hover { transform: translateY(-3px) rotate(.4deg); box-shadow: var(--shadow-lg); }
+    .grammar-name { font-size: .76rem; font-weight: 700; color: var(--text); margin-bottom: .5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-cute); }
+    .grammar-bar-track { height: 6px; background: rgba(111,194,233,0.15); border-radius: 50px; overflow: hidden; margin-bottom: .28rem; }
+    .grammar-bar-fill { height: 100%; border-radius: 50px; }
+    .grammar-stats-row { display: flex; justify-content: space-between; align-items: center; }
+    .grammar-pct { font-family: var(--font-cute); font-size: .72rem; font-weight: 700; }
+    .grammar-count { font-size: .62rem; color: var(--muted); font-weight: 600; }
+
+    /* ── Filter chips ── */
+    .filter-chips { display: flex; gap: .38rem; flex-wrap: wrap; }
+    .chip {
+      padding: .36rem .85rem; border-radius: 50px;
+      border: 1.5px solid rgba(111,194,233,0.25);
+      background: var(--card);
+      font-family: var(--font-main); font-size: .73rem; font-weight: 600;
+      color: var(--text2); cursor: pointer; transition: var(--transition);
+    }
+    .chip:hover { border-color: var(--sky-blue); color: var(--sky-blue-dark); }
+    .chip.active {
+      background: linear-gradient(135deg, var(--sky-blue), var(--sky-blue-dark));
+      color: #fff; border-color: transparent;
+      box-shadow: 0 3px 12px rgba(111,194,233,0.32);
     }
 
-    .grammar-chip:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .grammar-name {
-      font-size: .78rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: .5rem;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .grammar-bar-track {
-      height: 6px;
-      background: rgba(0, 0, 0, .07);
-      border-radius: 50px;
-      overflow: hidden;
-      margin-bottom: .3rem;
-    }
-
-    .grammar-bar-fill {
-      height: 100%;
-      border-radius: 50px;
-      transition: width 1s ease;
-    }
-
-    .grammar-stats-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .grammar-pct {
-      font-size: .72rem;
-      font-weight: 800;
-    }
-
-    .grammar-count {
-      font-size: .62rem;
-      color: var(--muted);
-      font-weight: 500;
-    }
-
-    /* ── Loading state ── */
-    .loading-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 4rem 2rem;
-      color: var(--muted);
-      gap: 1rem;
-    }
-
+    /* ── Loading / Empty ── */
+    .loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3.5rem 2rem; color: var(--muted); gap: .9rem; }
     .spinner {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 3px solid rgba(0, 113, 227, .15);
-      border-top-color: var(--accent);
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 3px solid rgba(111,194,233,0.2);
+      border-top-color: var(--sky-blue);
       animation: spin 0.75s linear infinite;
     }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .loading-text {
-      font-size: .85rem;
-      font-weight: 600;
-      color: var(--muted2);
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 3rem 2rem;
-      color: var(--muted);
-      font-size: .85rem;
-      font-weight: 500;
-    }
-
-    .empty-state .empty-icon {
-      font-size: 2.5rem;
-      margin-bottom: .75rem;
-      display: block;
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-family: var(--font-cute); font-size: .84rem; font-weight: 700; color: var(--muted); }
+    .empty-state { text-align: center; padding: 2.5rem 2rem; color: var(--muted); font-size: .84rem; font-weight: 600; font-family: var(--font-cute); }
+    .empty-state .empty-icon { font-size: 2.3rem; margin-bottom: .6rem; display: block; }
 
     /* ── Pagination ── */
     .pagination {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: .85rem 1.4rem;
-      border-top: 1px solid var(--sep);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .75rem 1.3rem; border-top: 1.5px solid var(--sep);
     }
-
-    .page-info {
-      font-size: .75rem;
-      color: var(--muted);
-      font-weight: 500;
-    }
-
-    .page-btns {
-      display: flex;
-      gap: .35rem;
-    }
-
+    .page-info { font-size: .72rem; color: var(--muted); font-weight: 600; font-family: var(--font-cute); }
+    .page-btns { display: flex; gap: .3rem; }
     .page-btn {
-      width: 30px;
-      height: 30px;
-      border-radius: var(--radius-xs);
-      border: 1px solid var(--sep);
-      background: var(--surface);
-      font-family: var(--font);
-      font-size: .75rem;
-      font-weight: 600;
-      color: var(--text2);
-      cursor: pointer;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 28px; height: 28px; border-radius: var(--radius-xs);
+      border: 1.5px solid rgba(111,194,233,0.25);
+      background: var(--card); font-family: var(--font-cute); font-size: .73rem; font-weight: 700;
+      color: var(--text2); cursor: pointer; transition: var(--transition);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .page-btn:hover { border-color: var(--sky-blue); color: var(--sky-blue-dark); }
+    .page-btn.active { background: linear-gradient(135deg, var(--sky-blue), var(--sky-blue-dark)); color: #fff; border-color: transparent; }
+    .page-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+    /* ══ STUDENT DETAIL MODAL ══ */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(60,100,140,0.3);
+      backdrop-filter: blur(14px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem; opacity: 0; pointer-events: none;
+      transition: opacity .25s ease;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--card);
+      border: 2px solid var(--card-border);
+      border-radius: 28px;
+      width: 100%; max-width: 740px; max-height: 88vh;
+      overflow: hidden; display: flex; flex-direction: column;
+      box-shadow: var(--shadow-lg);
+      transform: scale(.94) translateY(10px);
+      transition: transform .32s cubic-bezier(.34,1.56,.64,1);
+    }
+    .modal-overlay.open .modal { transform: scale(1) translateY(0); }
+
+    /* Modal Header */
+    .modal-header {
+      padding: 1.3rem 1.6rem .9rem;
+      border-bottom: 1.5px solid var(--sep);
+      display: flex; align-items: flex-start; gap: .9rem; flex-shrink: 0;
+      background: rgba(224,246,255,0.4);
+    }
+    .modal-avatar {
+      width: 46px; height: 46px; border-radius: 14px;
+      background: linear-gradient(135deg, var(--sky-mid), var(--sky-blue));
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-cute); font-size: 1.2rem; font-weight: 700;
+      color: #fff; flex-shrink: 0;
+      border: 2px solid rgba(255,255,255,0.7);
+      box-shadow: 0 4px 14px rgba(111,194,233,0.3);
+    }
+    .modal-name { font-family: var(--font-cute); font-size: 1.1rem; font-weight: 700; color: var(--text); }
+    .modal-meta { font-size: .7rem; color: var(--muted); font-weight: 600; margin-top: .12rem; }
+    .modal-close {
+      margin-left: auto; background: rgba(111,194,233,0.1);
+      border: 1.5px solid rgba(111,194,233,0.2);
+      width: 28px; height: 28px; border-radius: 50%;
+      font-size: .8rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--transition); color: var(--muted2); flex-shrink: 0;
+    }
+    .modal-close:hover { background: rgba(224,112,112,0.12); border-color: var(--danger); color: var(--danger); }
+
+    /* Modal Stats */
+    .modal-stats {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: .55rem; padding: .9rem 1.6rem; flex-shrink: 0;
+      border-bottom: 1.5px solid var(--sep);
+      background: rgba(224,246,255,0.2);
+    }
+    .mstat {
+      text-align: center; padding: .6rem;
+      background: rgba(255,253,250,0.8);
+      border-radius: var(--radius-sm);
+      border: 1.5px solid rgba(111,194,233,0.15);
+    }
+    .mstat-val { font-family: var(--font-cute); font-size: 1.25rem; font-weight: 700; }
+    .mstat-lbl { font-size: .6rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-top: .12rem; font-family: var(--font-cute); }
+
+    /* Modal Filter Tabs */
+    .modal-filter-bar {
+      padding: .75rem 1.6rem; border-bottom: 1.5px solid var(--sep);
+      flex-shrink: 0; background: rgba(255,253,250,0.7);
+    }
+    .modal-filter-label { font-size: .65rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: .5rem; font-family: var(--font-cute); }
+    .lesson-tabs {
+      display: flex; gap: .35rem; flex-wrap: wrap;
+    }
+    .lesson-tab {
+      padding: .32rem .75rem; border-radius: 50px;
+      border: 1.5px solid rgba(111,194,233,0.25);
+      background: rgba(224,246,255,0.5);
+      font-size: .7rem; font-weight: 600;
+      color: var(--text2); cursor: pointer; transition: var(--transition);
+      font-family: var(--font-main); white-space: nowrap;
+    }
+    .lesson-tab:hover { border-color: var(--sky-blue); color: var(--sky-blue-dark); background: rgba(111,194,233,0.1); }
+    .lesson-tab.active {
+      background: linear-gradient(135deg, var(--sky-blue), var(--sky-blue-dark));
+      color: #fff; border-color: transparent;
+      box-shadow: 0 2px 10px rgba(111,194,233,0.3);
     }
 
-    .page-btn:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
+    /* Modal Body */
+    .modal-body { overflow-y: auto; padding: 1rem 1.6rem 1.5rem; flex: 1; }
+    .modal-body::-webkit-scrollbar { width: 5px; }
+    .modal-body::-webkit-scrollbar-thumb { background: rgba(111,194,233,0.35); border-radius: 10px; }
 
-    .page-btn.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
+    /* Progress insight bar */
+    .lesson-progress-bar {
+      margin-bottom: 1rem; padding: .75rem 1rem;
+      background: rgba(224,246,255,0.5);
+      border: 1.5px solid rgba(111,194,233,0.18);
+      border-radius: var(--radius-sm);
     }
-
-    .page-btn:disabled {
-      opacity: .4;
-      cursor: not-allowed;
+    .lp-title { font-family: var(--font-cute); font-size: .78rem; font-weight: 700; color: var(--text); margin-bottom: .5rem; }
+    .lp-items { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .lp-item {
+      display: flex; align-items: center; gap: .35rem;
+      font-size: .7rem; font-weight: 600; color: var(--text2);
     }
+    .lp-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
-    /* ── Filter chips ── */
-    .filter-chips {
-      display: flex;
-      gap: .4rem;
-      flex-wrap: wrap;
-      margin-bottom: 1.25rem;
+    /* Session items */
+    .modal-section-title { font-family: var(--font-cute); font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: .6rem; }
+    .session-item {
+      border: 1.5px solid rgba(111,194,233,0.18);
+      border-radius: var(--radius-sm); margin-bottom: .55rem;
+      overflow: hidden; transition: var(--transition);
     }
-
-    .chip {
-      padding: .4rem .9rem;
-      border-radius: 50px;
-      border: 1px solid var(--sep);
-      background: var(--surface);
-      font-family: var(--font);
-      font-size: .75rem;
-      font-weight: 600;
-      color: var(--muted2);
-      cursor: pointer;
-      transition: var(--transition);
+    .session-item:hover { border-color: rgba(111,194,233,0.35); }
+    .session-head {
+      display: flex; align-items: center; gap: .7rem;
+      padding: .7rem .95rem; cursor: pointer;
+      background: rgba(224,246,255,0.4); transition: var(--transition);
     }
-
-    .chip:hover {
-      border-color: var(--accent);
-      color: var(--accent);
+    .session-head:hover { background: rgba(111,194,233,0.1); }
+    .session-emoji { font-size: 1.05rem; }
+    .session-info { flex: 1; min-width: 0; }
+    .session-lesson { font-size: .8rem; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-cute); }
+    .session-meta-row { font-size: .65rem; color: var(--muted); font-weight: 600; margin-top: .08rem; }
+    .session-pct { font-family: var(--font-cute); font-size: 1rem; font-weight: 700; }
+    .session-frac { font-size: .63rem; color: var(--muted); text-align: right; }
+    .session-chevron { font-size: .68rem; color: var(--muted); transition: transform .22s; }
+    .session-item.expanded .session-chevron { transform: rotate(180deg); }
+    .session-questions { display: none; padding: .7rem .95rem; border-top: 1.5px solid var(--sep); background: rgba(255,253,250,0.7); }
+    .session-item.expanded .session-questions { display: block; }
+    .q-row {
+      display: flex; gap: .55rem; padding: .45rem .55rem;
+      border-radius: var(--radius-xs); margin-bottom: .35rem; font-size: .74rem;
     }
-
-    .chip.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
+    .q-row.correct { background: rgba(90,171,130,0.08); border-left: 2.5px solid rgba(90,171,130,0.4); }
+    .q-row.wrong   { background: rgba(224,112,112,0.07); border-left: 2.5px solid rgba(224,112,112,0.35); }
+    .q-badge {
+      padding: .1rem .38rem; border-radius: 4px;
+      font-size: .58rem; font-weight: 800; flex-shrink: 0; margin-top: .1rem;
+      font-family: var(--font-cute);
     }
+    .q-badge.c { background: rgba(90,171,130,0.18); color: var(--success); }
+    .q-badge.w { background: rgba(224,112,112,0.16); color: var(--danger); }
+    .q-content { flex: 1; }
+    .q-text { font-weight: 600; color: var(--text); margin-bottom: .12rem; line-height: 1.4; }
+    .q-ans { color: var(--text2); line-height: 1.4; }
 
-    /* ── Section header ── */
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.1rem;
-    }
-
-    .section-title {
-      font-size: 1rem;
-      font-weight: 800;
-      color: var(--text);
-      letter-spacing: -.03em;
-    }
-
-    .section-sub {
-      font-size: .72rem;
-      color: var(--muted);
-      font-weight: 500;
-      margin-top: .15rem;
-    }
-
-    /* ── Responsive ── */
+    /* Responsive */
     @media (max-width: 1100px) {
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .charts-row {
-        grid-template-columns: 1fr;
-      }
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+      .charts-row { grid-template-columns: 1fr; }
     }
-
     @media (max-width: 768px) {
-      .sidebar {
-        display: none;
-      }
-
-      .main {
-        margin-left: 0;
-      }
-
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .content {
-        padding: 1.25rem 1rem 2rem;
-      }
-    }
-
-    /* ── Tooltip ── */
-    [data-tooltip] {
-      position: relative;
-    }
-
-    [data-tooltip]::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: calc(100% + 6px);
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(29, 29, 31, .9);
-      color: #fff;
-      padding: .3rem .6rem;
-      border-radius: 6px;
-      font-size: .65rem;
-      font-weight: 600;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity .15s;
-      z-index: 999;
-    }
-
-    [data-tooltip]:hover::after {
-      opacity: 1;
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+      .content { padding: 1rem .9rem 2rem; }
     }
   </style>
 </head>
-
 <body>
-  <div class="app">
+<div class="app">
 
-    <!-- ══ SIDEBAR ══ -->
-    <aside class="sidebar">
-      <div class="sidebar-logo">
-        <div class="sidebar-logo-icon">📊</div>
-        <div>
-          <div class="sidebar-logo-text">Dashboard GV</div>
-          <div class="sidebar-logo-sub">Thầy Du Gia Văn</div>
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">🌿</div>
+      <div>
+        <div class="sidebar-logo-text">Dashboard GV</div>
+        <div class="sidebar-logo-sub">Thầy Du Gia Văn</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" onclick="switchView('overview')" id="nav-overview">
+        <span class="nav-item-icon">🏠</span><span class="nav-label">Tổng quan</span>
+      </button>
+      <button class="nav-item" onclick="switchView('students')" id="nav-students">
+        <span class="nav-item-icon">🌸</span><span class="nav-label">Học sinh</span>
+        <span class="nav-badge" id="badge-students">—</span>
+      </button>
+      <button class="nav-item" onclick="switchView('grammar')" id="nav-grammar">
+        <span class="nav-item-icon">📖</span><span class="nav-label">Ngữ Pháp</span>
+      </button>
+      <button class="nav-item" onclick="switchView('lessons')" id="nav-lessons">
+        <span class="nav-item-icon">🍃</span><span class="nav-label">Bài học</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">✦ Dashboard của<br><strong>Thầy Du Gia Văn</strong><br>Không cần đăng nhập ✦</div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <div class="main">
+    <header class="header">
+      <div class="header-icon" id="view-icon">🌿</div>
+      <div>
+        <div class="header-title" id="view-title">Tổng quan</div>
+        <div class="header-subtitle" id="view-subtitle">Thống kê toàn lớp</div>
+      </div>
+      <div class="header-right">
+        <span class="last-refresh" id="last-refresh">Chưa tải dữ liệu</span>
+        <button class="btn btn-primary" onclick="loadData()" id="btn-refresh">🌟 Tải dữ liệu</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ══ OVERVIEW ══ -->
+      <div class="view active" id="view-overview">
+        <div class="stats-grid" id="overview-stats">
+          <div class="stat-card blue"><span class="stat-icon">🌸</span><div class="stat-val">—</div><div class="stat-lbl">Học sinh</div></div>
+          <div class="stat-card green"><span class="stat-icon">✅</span><div class="stat-val">—</div><div class="stat-lbl">Bài nộp</div></div>
+          <div class="stat-card honey"><span class="stat-icon">📈</span><div class="stat-val">—</div><div class="stat-lbl">Điểm TB</div></div>
+          <div class="stat-card peach"><span class="stat-icon">❓</span><div class="stat-val">—</div><div class="stat-lbl">Tổng câu</div></div>
+        </div>
+
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">🌈 Phân bố điểm số</div>
+                <div class="chart-subtitle">Tất cả bài nộp theo khoảng điểm %</div>
+              </div>
+            </div>
+            <div class="chart-wrap"><canvas id="chart-score-dist"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header"><div>
+              <div class="chart-title">🏆 Top học sinh</div>
+              <div class="chart-subtitle">Điểm trung bình cao nhất</div>
+            </div></div>
+            <div id="top-students-list" class="top-list">
+              <div class="loading-state" style="padding:1.2rem"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-header"><div>
+              <div class="chart-title">📅 Hoạt động theo ngày</div>
+              <div class="chart-subtitle">Số bài nộp (30 ngày gần nhất)</div>
+            </div></div>
+            <div class="chart-wrap"><canvas id="chart-activity"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header"><div>
+              <div class="chart-title">🍃 Bài học phổ biến</div>
+              <div class="chart-subtitle">Số lần làm theo bài</div>
+            </div></div>
+            <div class="chart-wrap"><canvas id="chart-lessons-pop"></canvas></div>
+          </div>
         </div>
       </div>
-      <nav class="sidebar-nav">
-        <button class="nav-item active" onclick="switchView('overview')" id="nav-overview">
-          <span class="nav-item-icon">🏠</span><span class="nav-label">Tổng quan</span>
-        </button>
-        <button class="nav-item" onclick="switchView('students')" id="nav-students">
-          <span class="nav-item-icon">👥</span><span class="nav-label">Học sinh</span>
-          <span class="nav-badge" id="badge-students">—</span>
-        </button>
-        <button class="nav-item" onclick="switchView('grammar')" id="nav-grammar">
-          <span class="nav-item-icon">📚</span><span class="nav-label">Điểm Ngữ Pháp</span>
-        </button>
-        <button class="nav-item" onclick="switchView('lessons')" id="nav-lessons">
-          <span class="nav-item-icon">📋</span><span class="nav-label">Bài học</span>
-        </button>
-      </nav>
-      <div class="sidebar-footer">Dashboard dành cho<br><strong>Thầy Du Gia Văn</strong><br>Không yêu cầu đăng nhập
+
+      <!-- ══ STUDENTS ══ -->
+      <div class="view" id="view-students">
+        <div class="table-card">
+          <div class="table-toolbar">
+            <div class="table-title">🌸 Danh sách học sinh</div>
+            <div class="search-wrap">
+              <input type="text" placeholder="Tìm học sinh..." id="search-students" oninput="filterStudents()">
+            </div>
+            <select class="filter-select" id="filter-score" onchange="filterStudents()">
+              <option value="all">Tất cả điểm</option>
+              <option value="high">≥ 80% 🏆</option>
+              <option value="mid">50–79% 🌿</option>
+              <option value="low">&lt; 50% 💪</option>
+            </select>
+            <select class="filter-select" id="sort-students" onchange="filterStudents()">
+              <option value="name">Tên A–Z</option>
+              <option value="avg_desc">Điểm TB ↓</option>
+              <option value="avg_asc">Điểm TB ↑</option>
+              <option value="tests_desc">Bài nộp ↓</option>
+            </select>
+          </div>
+          <div id="students-table-wrap">
+            <div class="loading-state"><div class="spinner"></div><div class="loading-text">Vui lòng tải dữ liệu</div></div>
+          </div>
+          <div class="pagination" id="students-pagination" style="display:none">
+            <span class="page-info" id="page-info-students"></span>
+            <div class="page-btns" id="page-btns-students"></div>
+          </div>
+        </div>
       </div>
-    </aside>
 
-    <!-- ══ MAIN CONTENT ══ -->
-    <div class="main">
-      <header class="header">
-        <div>
-          <div class="header-title" id="view-title">Tổng quan</div>
-          <div class="header-subtitle" id="view-subtitle">Thống kê toàn lớp</div>
-        </div>
-        <div class="header-right">
-          <span class="last-refresh" id="last-refresh">Chưa tải dữ liệu</span>
-          <button class="btn btn-primary" onclick="loadData()" id="btn-refresh">
-            ⟳ Tải dữ liệu
-          </button>
-        </div>
-      </header>
-
-      <div class="content">
-
-        <!-- ══ OVERVIEW ══ -->
-        <div class="view active" id="view-overview">
-          <div class="stats-grid" id="overview-stats">
-            <div class="stat-card blue"><span class="stat-icon">👥</span>
-              <div class="stat-val">—</div>
-              <div class="stat-lbl">Học sinh</div>
-            </div>
-            <div class="stat-card green"><span class="stat-icon">✅</span>
-              <div class="stat-val">—</div>
-              <div class="stat-lbl">Bài nộp</div>
-            </div>
-            <div class="stat-card purple"><span class="stat-icon">📈</span>
-              <div class="stat-val">—</div>
-              <div class="stat-lbl">Điểm TB</div>
-            </div>
-            <div class="stat-card red"><span class="stat-icon">⚡</span>
-              <div class="stat-val">—</div>
-              <div class="stat-lbl">Hôm nay</div>
-            </div>
+      <!-- ══ GRAMMAR ══ -->
+      <div class="view" id="view-grammar">
+        <div class="section-header" style="margin-bottom:1rem">
+          <div>
+            <div class="section-title">📖 Điểm ngữ pháp</div>
+            <div class="section-sub">Tỷ lệ đúng/sai theo từng chủ điểm ngữ pháp</div>
           </div>
-
-          <div class="charts-row">
-            <div class="chart-card">
-              <div class="chart-header">
-                <div>
-                  <div class="chart-title">📊 Phân bố điểm số</div>
-                  <div class="chart-subtitle">Tất cả bài nộp theo khoảng điểm %</div>
-                </div>
-              </div>
-              <div class="chart-wrap">
-                <canvas id="chart-score-dist"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-header">
-                <div>
-                  <div class="chart-title">🏆 Top học sinh</div>
-                  <div class="chart-subtitle">Điểm TB cao nhất</div>
-                </div>
-              </div>
-              <div id="top-students-list" class="top-list">
-                <div class="loading-state" style="padding:1.5rem">
-                  <div class="spinner"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="charts-row">
-            <div class="chart-card">
-              <div class="chart-header">
-                <div>
-                  <div class="chart-title">📅 Hoạt động theo ngày</div>
-                  <div class="chart-subtitle">Số bài nộp mỗi ngày (30 ngày gần nhất)</div>
-                </div>
-              </div>
-              <div class="chart-wrap">
-                <canvas id="chart-activity"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-header">
-                <div>
-                  <div class="chart-title">📚 Bài học phổ biến</div>
-                  <div class="chart-subtitle">Số lần làm theo bài</div>
-                </div>
-              </div>
-              <div class="chart-wrap">
-                <canvas id="chart-lessons-pop"></canvas>
-              </div>
-            </div>
+          <div class="filter-chips" id="grammar-filter-chips">
+            <button class="chip active" onclick="setGrammarSort('pct_asc',this)">Yếu nhất trước</button>
+            <button class="chip" onclick="setGrammarSort('pct_desc',this)">Tốt nhất trước</button>
+            <button class="chip" onclick="setGrammarSort('count_desc',this)">Nhiều câu nhất</button>
           </div>
         </div>
-
-        <!-- ══ STUDENTS LIST ══ -->
-        <div class="view" id="view-students">
-          <div class="table-card">
-            <div class="table-toolbar">
-              <div class="table-title">Danh sách học sinh</div>
-              <div class="search-wrap">
-                <input type="text" placeholder="Tìm học sinh..." id="search-students" oninput="filterStudents()">
-              </div>
-              <select class="filter-select" id="filter-score" onchange="filterStudents()">
-                <option value="all">Tất cả điểm</option>
-                <option value="high">≥ 80% 🏆</option>
-                <option value="mid">50–79% 👍</option>
-                <option value="low">&lt; 50% 💪</option>
-              </select>
-              <select class="filter-select" id="sort-students" onchange="filterStudents()">
-                <option value="name">Tên A-Z</option>
-                <option value="avg_desc">Điểm TB ↓</option>
-                <option value="avg_asc">Điểm TB ↑</option>
-                <option value="tests_desc">Bài nộp ↓</option>
-              </select>
-            </div>
-            <div id="students-table-wrap">
-              <div class="loading-state">
-                <div class="spinner"></div>
-                <div class="loading-text">Vui lòng tải dữ liệu</div>
-              </div>
-            </div>
-            <div class="pagination" id="students-pagination" style="display:none">
-              <span class="page-info" id="page-info-students"></span>
-              <div class="page-btns" id="page-btns-students"></div>
-            </div>
-          </div>
+        <div id="grammar-grid">
+          <div class="loading-state"><div class="spinner"></div><div class="loading-text">Vui lòng tải dữ liệu</div></div>
         </div>
-
-        <!-- ══ GRAMMAR POINTS ══ -->
-        <div class="view" id="view-grammar">
-          <div class="section-header">
-            <div>
-              <div class="section-title">Điểm ngữ pháp</div>
-              <div class="section-sub">Tỷ lệ đúng/sai theo từng chủ điểm ngữ pháp</div>
-            </div>
-            <div class="filter-chips" id="grammar-filter-chips">
-              <button class="chip active" onclick="setGrammarSort('pct_asc', this)">Yếu nhất trước</button>
-              <button class="chip" onclick="setGrammarSort('pct_desc', this)">Tốt nhất trước</button>
-              <button class="chip" onclick="setGrammarSort('count_desc', this)">Nhiều câu nhất</button>
-            </div>
-          </div>
-          <div id="grammar-grid">
-            <div class="loading-state">
-              <div class="spinner"></div>
-              <div class="loading-text">Vui lòng tải dữ liệu</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ══ LESSONS ══ -->
-        <div class="view" id="view-lessons">
-          <div class="table-card">
-            <div class="table-toolbar">
-              <div class="table-title">Thống kê bài học</div>
-              <div class="search-wrap">
-                <input type="text" placeholder="Tìm bài học..." id="search-lessons" oninput="filterLessons()">
-              </div>
-            </div>
-            <div id="lessons-table-wrap">
-              <div class="loading-state">
-                <div class="spinner"></div>
-                <div class="loading-text">Vui lòng tải dữ liệu</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- /content -->
-    </div><!-- /main -->
-  </div><!-- /app -->
-
-  <!-- ══ STUDENT DETAIL MODAL ══ -->
-  <div class="modal-overlay" id="modal-student" onclick="closeModal(event)">
-    <div class="modal" id="modal-box">
-      <div class="modal-header">
-        <div class="modal-avatar" id="modal-avatar">?</div>
-        <div style="flex:1;min-width:0">
-          <div class="modal-name" id="modal-name">—</div>
-          <div class="modal-meta" id="modal-meta">—</div>
-        </div>
-        <button class="modal-close" onclick="closeModalDirect()">✕</button>
       </div>
-      <div class="modal-stats" id="modal-stats"></div>
-      <div class="modal-body" id="modal-body"></div>
+
+      <!-- ══ LESSONS ══ -->
+      <div class="view" id="view-lessons">
+        <div class="table-card">
+          <div class="table-toolbar">
+            <div class="table-title">🍃 Thống kê bài học</div>
+            <div class="search-wrap">
+              <input type="text" placeholder="Tìm bài học..." id="search-lessons" oninput="filterLessons()">
+            </div>
+          </div>
+          <div id="lessons-table-wrap">
+            <div class="loading-state"><div class="spinner"></div><div class="loading-text">Vui lòng tải dữ liệu</div></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
+</div>
 
-  <script>
-    /* ═══════════════════════════════════════════════
-       ⚙️ CẤU HÌNH — chỉ cần chỉnh phần này
-    ═══════════════════════════════════════════════ */
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1T3cMJEwplC2jmgnYxxJBN5QjIBf38IaBo15NZg50Dm27Tqq2esq9ADx2JpxiSuFflQ/exec';
-    const ROWS_PER_PAGE = 15; // Số học sinh mỗi trang
+<!-- ══ STUDENT DETAIL MODAL ══ -->
+<div class="modal-overlay" id="modal-student" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-avatar" id="modal-avatar">?</div>
+      <div style="flex:1;min-width:0">
+        <div class="modal-name" id="modal-name">—</div>
+        <div class="modal-meta" id="modal-meta">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-stats" id="modal-stats"></div>
+    <!-- ── Lesson filter tabs ── -->
+    <div class="modal-filter-bar" id="modal-filter-bar">
+      <div class="modal-filter-label">🍃 Xem theo bài học</div>
+      <div class="lesson-tabs" id="lesson-tabs"></div>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
 
-    /* ═══════════════════════════════════════════════
-       STATE
-    ═══════════════════════════════════════════════ */
-    let allRecords = [];     // Toàn bộ raw records từ server
-    let studentMap = {};     // { studentName: { records, avg, totalCorrect, totalWrong } }
-    let grammarMap = {};     // { lessonTag: { correct, wrong, total } }
-    let lessonMap = {};      // { lessonName: { count, avgPct, ... } }
-    let filteredStudents = [];
-    let currentPage = 1;
-    let currentView = 'overview';
-    let grammarSort = 'pct_asc';
-    let charts = {};
+<script>
+/* ════════════════════════════════════════════
+   ⚙️ CẤU HÌNH — chỉ cần sửa ở đây
+════════════════════════════════════════════ */
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1T3cMJEwplC2jmgnYxxJBN5QjIBf38IaBo15NZg50Dm27Tqq2esq9ADx2JpxiSuFflQ/exec';
+const ROWS_PER_PAGE = 15;
 
-    /* ═══════════════════════════════════════════════
-       NAVIGATION
-    ═══════════════════════════════════════════════ */
-    const VIEW_META = {
-      overview: { title: 'Tổng quan', sub: 'Thống kê toàn lớp' },
-      students: { title: 'Danh sách học sinh', sub: 'Xem chi tiết từng học sinh' },
-      grammar: { title: 'Điểm ngữ pháp', sub: 'Tỷ lệ đúng theo chủ điểm' },
-      lessons: { title: 'Bài học', sub: 'Thống kê theo từng bài' },
+/* ════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════ */
+let allRecords    = [];
+let studentMap    = {};
+let grammarMap    = {};
+let lessonMap     = {};
+let filteredStudents = [];
+let currentPage   = 1;
+let grammarSort   = 'pct_asc';
+let charts        = {};
+
+// Modal state
+let modalStudentName  = '';
+let modalActivelesson = 'all'; // 'all' or a lessonName
+
+/* ════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════ */
+const VIEW_META = {
+  overview: { title:'Tổng quan',        sub:'Thống kê toàn lớp',            icon:'🌿' },
+  students: { title:'Danh sách học sinh',sub:'Xem chi tiết từng học sinh',   icon:'🌸' },
+  grammar:  { title:'Điểm ngữ pháp',    sub:'Tỷ lệ đúng theo chủ điểm',    icon:'📖' },
+  lessons:  { title:'Bài học',          sub:'Thống kê theo từng bài',        icon:'🍃' },
+};
+
+function switchView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  const m = VIEW_META[id];
+  document.getElementById('view-title').textContent    = m.title;
+  document.getElementById('view-subtitle').textContent = m.sub;
+  document.getElementById('view-icon').textContent     = m.icon;
+}
+
+/* ════════════════════════════════════════════
+   DATA LOADING
+════════════════════════════════════════════ */
+async function loadData() {
+  const btn = document.getElementById('btn-refresh');
+  btn.disabled = true; btn.textContent = '⏳ Đang tải...';
+  document.getElementById('last-refresh').textContent = 'Đang tải...';
+  try {
+    const res = await fetch(GOOGLE_SCRIPT_URL + '?action=history', { redirect:'follow' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (data.status !== 'success') throw new Error(data.message || 'Lỗi server');
+    allRecords = parseRecords(data.data || []);
+    processData();
+    renderAll();
+    document.getElementById('last-refresh').textContent = 'Cập nhật: ' + new Date().toLocaleString('vi-VN');
+  } catch(err) {
+    alert('❌ Lỗi tải dữ liệu: ' + err.message);
+    document.getElementById('last-refresh').textContent = 'Tải thất bại';
+  } finally {
+    btn.disabled = false; btn.textContent = '🌟 Làm mới';
+  }
+}
+
+function parseRecords(rawData) {
+  return rawData.map(row => {
+    const rec = row.record || {};
+    const answers = rec.answers || [];
+    const correct = answers.filter(a => a.correct).length;
+    const total   = answers.length;
+    const pct     = total > 0 ? Math.round((correct/total)*100) : (Number(row.pct)||0);
+    return {
+      testID:      row.testID || rec.id || '',
+      date:        rec.date || row.timestamp || '',
+      timestamp:   rec.timestamp || row.timestamp || 0,
+      studentName: (row.studentName || rec.studentName || '').trim(),
+      lessonName:  row.lessonName || rec.lessonName || '',
+      score:  correct,
+      total:  total || Number(row.total) || 0,
+      pct,
+      answers,
     };
+  }).filter(r => r.studentName);
+}
 
-    function switchView(id) {
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.getElementById('view-' + id).classList.add('active');
-      document.getElementById('nav-' + id).classList.add('active');
-      document.getElementById('view-title').textContent = VIEW_META[id].title;
-      document.getElementById('view-subtitle').textContent = VIEW_META[id].sub;
-      currentView = id;
-    }
+/* ════════════════════════════════════════════
+   DATA PROCESSING
+════════════════════════════════════════════ */
+function processData() {
+  studentMap = {}; grammarMap = {}; lessonMap = {};
+  allRecords.forEach(r => {
+    // Student
+    if (!studentMap[r.studentName])
+      studentMap[r.studentName] = { name:r.studentName, records:[], totalCorrect:0, totalWrong:0, totalQ:0 };
+    const s = studentMap[r.studentName];
+    s.records.push(r);
+    s.totalCorrect += r.score;
+    s.totalWrong   += (r.total - r.score);
+    s.totalQ       += r.total;
+    // Lesson
+    if (!lessonMap[r.lessonName]) lessonMap[r.lessonName] = { name:r.lessonName, count:0, totalPct:0, correct:0, wrong:0 };
+    lessonMap[r.lessonName].count++;
+    lessonMap[r.lessonName].totalPct += r.pct;
+    lessonMap[r.lessonName].correct  += r.score;
+    lessonMap[r.lessonName].wrong    += (r.total - r.score);
+    // Grammar
+    r.answers.forEach(ans => {
+      const tag = (ans.q && ans.q.lesson) ? ans.q.lesson.trim() : null;
+      if (!tag) return;
+      if (!grammarMap[tag]) grammarMap[tag] = { tag, correct:0, wrong:0 };
+      if (ans.correct) grammarMap[tag].correct++; else grammarMap[tag].wrong++;
+    });
+  });
+  Object.values(studentMap).forEach(s => {
+    s.avgPct    = s.totalQ > 0 ? Math.round((s.totalCorrect/s.totalQ)*100) : 0;
+    s.testCount = s.records.length;
+    s.records.sort((a,b) => (b.timestamp||0)-(a.timestamp||0));
+  });
+  filteredStudents = Object.values(studentMap);
+  filterStudents();
+  document.getElementById('badge-students').textContent = Object.keys(studentMap).length;
+}
 
-    /* ═══════════════════════════════════════════════
-       DATA LOADING
-    ═══════════════════════════════════════════════ */
-    async function loadData() {
-      const btn = document.getElementById('btn-refresh');
-      btn.disabled = true; btn.textContent = '⟳ Đang tải...';
-      document.getElementById('last-refresh').textContent = 'Đang tải...';
+/* ════════════════════════════════════════════
+   RENDER ALL
+════════════════════════════════════════════ */
+function renderAll() {
+  renderOverviewStats();
+  renderChartScoreDist();
+  renderChartActivity();
+  renderChartLessonsPop();
+  renderTopStudents();
+  renderStudentsTable();
+  renderGrammarGrid();
+  renderLessonsTable();
+}
 
-      try {
-        const res = await fetch(GOOGLE_SCRIPT_URL + '?action=history', { redirect: 'follow' });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const data = await res.json();
-        if (data.status !== 'success') throw new Error(data.message || 'Lỗi server');
-
-        allRecords = parseRecords(data.data || []);
-        processData();
-        renderAll();
-
-        const now = new Date().toLocaleString('vi-VN');
-        document.getElementById('last-refresh').textContent = 'Cập nhật: ' + now;
-      } catch (err) {
-        alert('❌ Lỗi tải dữ liệu: ' + err.message);
-        document.getElementById('last-refresh').textContent = 'Tải thất bại';
-      } finally {
-        btn.disabled = false; btn.textContent = '⟳ Làm mới';
-      }
-    }
-
-    function parseRecords(rawData) {
-      return rawData.map(row => {
-        const rec = row.record || {};
-        const answers = rec.answers || [];
-        const correct = answers.filter(a => a.correct).length;
-        const wrong = answers.filter(a => !a.correct).length;
-        const total = answers.length;
-        const pct = total > 0 ? Math.round((correct / total) * 100) : (Number(row.pct) || 0);
-        return {
-          testID: row.testID || rec.id || '',
-          date: rec.date || row.timestamp || '',
-          timestamp: rec.timestamp || row.timestamp || 0,
-          studentName: (row.studentName || rec.studentName || '').trim(),
-          lessonName: row.lessonName || rec.lessonName || '',
-          score: correct,
-          total: total || Number(row.total) || 0,
-          pct: pct,
-          answers: answers
-        };
-      }).filter(r => r.studentName);
-    }
-
-    /* ═══════════════════════════════════════════════
-       DATA PROCESSING
-    ═══════════════════════════════════════════════ */
-    function processData() {
-      studentMap = {}; grammarMap = {}; lessonMap = {};
-
-      allRecords.forEach(r => {
-        // Student
-        if (!studentMap[r.studentName]) {
-          studentMap[r.studentName] = { name: r.studentName, records: [], totalCorrect: 0, totalWrong: 0, totalQ: 0 };
-        }
-        const s = studentMap[r.studentName];
-        s.records.push(r);
-        s.totalCorrect += r.score;
-        s.totalWrong += (r.total - r.score);
-        s.totalQ += r.total;
-
-        // Lesson
-        if (!lessonMap[r.lessonName]) {
-          lessonMap[r.lessonName] = {
-            name: r.lessonName,
-            count: 0,
-            totalPct: 0,
-            correct: 0,
-            wrong: 0,
-            students: [] // <--- 1. Khởi tạo mảng học viên mới
-          };
-        }
-        lessonMap[r.lessonName].count++;
-        lessonMap[r.lessonName].totalPct += r.pct;
-        lessonMap[r.lessonName].correct += r.score;
-        lessonMap[r.lessonName].wrong += (r.total - r.score);
-
-        // <--- 2. Kiểm tra và thêm học viên vào (tránh trùng tên cho sạch dữ liệu)
-        if (!lessonMap[r.lessonName].students.includes(r.studentName)) {
-          lessonMap[r.lessonName].students.push(r.studentName);
-        }
-
-        // Grammar (from answers.q.lesson)
-        r.answers.forEach(ans => {
-          const tag = (ans.q && ans.q.lesson) ? ans.q.lesson.trim() : null;
-          if (!tag) return;
-          if (!grammarMap[tag]) grammarMap[tag] = { tag, correct: 0, wrong: 0 };
-          if (ans.correct) grammarMap[tag].correct++;
-          else grammarMap[tag].wrong++;
-        });
-      });
-
-      // Compute avg pct for each student
-      Object.values(studentMap).forEach(s => {
-        s.avgPct = s.totalQ > 0 ? Math.round((s.totalCorrect / s.totalQ) * 100) : 0;
-        s.testCount = s.records.length;
-        s.records.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-      });
-
-      // Sort by avgPct for leaderboard
-      filteredStudents = Object.values(studentMap);
-      filterStudents();
-
-      // Update badge
-      document.getElementById('badge-students').textContent = Object.keys(studentMap).length;
-    }
-
-    /* ═══════════════════════════════════════════════
-       RENDER ALL
-    ═══════════════════════════════════════════════ */
-    function renderAll() {
-      renderOverviewStats();
-      renderChartScoreDist();
-      renderChartActivity();
-      renderChartLessonsPop();
-      renderTopStudents();
-      renderStudentsTable();
-      renderGrammarGrid();
-      renderLessonsTable();
-    }
-
-    /* ── OVERVIEW STATS ── */
-    function renderOverviewStats() {
-      const students = Object.keys(studentMap).length;
-      const submissions = allRecords.length;
-      const totalQ = allRecords.reduce((s, r) => s + r.total, 0);
-      const totalC = allRecords.reduce((s, r) => s + r.score, 0);
-      const avgPct = totalQ > 0 ? Math.round((totalC / totalQ) * 100) : 0;
-
-      const today = new Date().toLocaleDateString('vi-VN');
-      const todayCount = allRecords.filter(r => {
-        if (!r.date) return false;
-        return r.date.includes(new Date().getDate() + '/');
-      }).length;
-
-      const g = document.getElementById('overview-stats');
-      g.innerHTML = `
+/* ── Overview Stats ── */
+function renderOverviewStats() {
+  const students    = Object.keys(studentMap).length;
+  const submissions = allRecords.length;
+  const totalQ  = allRecords.reduce((s,r) => s+r.total, 0);
+  const totalC  = allRecords.reduce((s,r) => s+r.score, 0);
+  const avgPct  = totalQ > 0 ? Math.round((totalC/totalQ)*100) : 0;
+  const todayCt = allRecords.filter(r => {
+    if (!r.timestamp) return false;
+    const d = new Date(r.timestamp);
+    const n = new Date();
+    return d.getDate()===n.getDate() && d.getMonth()===n.getMonth() && d.getFullYear()===n.getFullYear();
+  }).length;
+  const g = document.getElementById('overview-stats');
+  g.innerHTML = `
     <div class="stat-card blue">
-      <span class="stat-icon">👥</span>
+      <span class="stat-icon">🌸</span>
       <div class="stat-val">${students}</div>
       <div class="stat-lbl">Học sinh</div>
       <div class="stat-trend neutral">${Object.keys(lessonMap).length} bài học</div>
@@ -1748,258 +883,237 @@
       <span class="stat-icon">✅</span>
       <div class="stat-val">${submissions}</div>
       <div class="stat-lbl">Bài nộp</div>
-      <div class="stat-trend ${todayCount > 0 ? 'up' : 'neutral'}">+${todayCount} hôm nay</div>
+      <div class="stat-trend ${todayCt>0?'up':'neutral'}">+${todayCt} hôm nay</div>
     </div>
-    <div class="stat-card purple">
+    <div class="stat-card honey">
       <span class="stat-icon">📈</span>
       <div class="stat-val">${avgPct}%</div>
       <div class="stat-lbl">Điểm TB toàn lớp</div>
-      <div class="stat-trend ${avgPct >= 70 ? 'up' : avgPct >= 50 ? 'neutral' : 'down'}">${avgPct >= 70 ? '🏆 Giỏi' : avgPct >= 50 ? '👍 Tốt' : '💪 Cần cố gắng'}</div>
+      <div class="stat-trend ${avgPct>=70?'up':avgPct>=50?'neutral':'down'}">${avgPct>=70?'🌟 Giỏi':avgPct>=50?'🌿 Tốt':'💪 Cần cố'}</div>
     </div>
-    <div class="stat-card red">
+    <div class="stat-card peach">
       <span class="stat-icon">❓</span>
       <div class="stat-val">${totalQ}</div>
       <div class="stat-lbl">Tổng câu hỏi</div>
       <div class="stat-trend up">✅ ${totalC} câu đúng</div>
-    </div>
-  `;
+    </div>`;
+}
+
+/* ── Chart helpers ── */
+function destroyChart(k) { if (charts[k]) { charts[k].destroy(); delete charts[k]; } }
+
+const GHIBLI_COLORS = ['#e07070','#e8a040','#f5c842','#7ec8a0','#6fc2e9','#c9b8f0','#ffb7a0'];
+
+function chartDefaults() {
+  return {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend:{ display:false } },
+  };
+}
+
+/* ── Score Distribution ── */
+function renderChartScoreDist() {
+  const buckets = [0,0,0,0,0];
+  allRecords.forEach(r => { const i=Math.min(Math.floor(r.pct/20),4); buckets[i]++; });
+  const labels = ['0–19%','20–39%','40–59%','60–79%','80–100%'];
+  destroyChart('score-dist');
+  const ctx = document.getElementById('chart-score-dist').getContext('2d');
+  charts['score-dist'] = new Chart(ctx, {
+    type:'bar',
+    data:{ labels, datasets:[{ data:buckets, backgroundColor:GHIBLI_COLORS, borderRadius:10, borderSkipped:false }] },
+    options:{
+      ...chartDefaults(),
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>` ${c.raw} bài` } } },
+      scales:{
+        x:{ grid:{display:false}, ticks:{ font:{family:"'Quicksand'",size:11,weight:'700'}, color:'#8fa0b0' } },
+        y:{ grid:{color:'rgba(111,194,233,0.1)'}, ticks:{ font:{family:"'Quicksand'",size:11}, color:'#8fa0b0', precision:0 } }
+      }
     }
+  });
+}
 
-    /* ── CHART: Score Distribution ── */
-    function renderChartScoreDist() {
-      const buckets = [0, 0, 0, 0, 0]; // 0-19, 20-39, 40-59, 60-79, 80-100
-      allRecords.forEach(r => {
-        const i = Math.min(Math.floor(r.pct / 20), 4);
-        buckets[i]++;
-      });
-      const labels = ['0–19%', '20–39%', '40–59%', '60–79%', '80–100%'];
-      const colors = ['#ff3b30', '#ff9500', '#ffcc00', '#34c759', '#0071e3'];
-      destroyChart('score-dist');
-      const ctx = document.getElementById('chart-score-dist').getContext('2d');
-      charts['score-dist'] = new Chart(ctx, {
-        type: 'bar',
-        data: { labels, datasets: [{ data: buckets, backgroundColor: colors, borderRadius: 8, borderSkipped: false }] },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw} bài` } } },
-          scales: {
-            x: { grid: { display: false }, ticks: { font: { family: "'Plus Jakarta Sans'", size: 11, weight: '600' }, color: '#86868b' } },
-            y: { grid: { color: 'rgba(0,0,0,.05)' }, ticks: { font: { family: "'Plus Jakarta Sans'", size: 11 }, color: '#86868b', precision: 0 } }
-          }
-        }
-      });
+/* ── Activity ── */
+function renderChartActivity() {
+  const dayMap = {};
+  const now = Date.now(); const days30 = 30*24*60*60*1000;
+  allRecords.forEach(r => {
+    if (!r.timestamp || now-r.timestamp > days30) return;
+    const d = new Date(r.timestamp).toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'});
+    dayMap[d] = (dayMap[d]||0)+1;
+  });
+  const sorted = Object.entries(dayMap).sort((a,b)=>a[0].localeCompare(b[0]));
+  destroyChart('activity');
+  const ctx = document.getElementById('chart-activity').getContext('2d');
+  const grad = ctx.createLinearGradient(0,0,0,200);
+  grad.addColorStop(0,'rgba(111,194,233,0.3)');
+  grad.addColorStop(1,'rgba(111,194,233,0)');
+  charts['activity'] = new Chart(ctx, {
+    type:'line',
+    data:{ labels:sorted.map(e=>e[0]), datasets:[{ data:sorted.map(e=>e[1]), borderColor:'#6fc2e9', backgroundColor:grad, borderWidth:2.5, fill:true, tension:0.42, pointRadius:sorted.length<15?4:0, pointHoverRadius:6, pointBackgroundColor:'#6fc2e9' }] },
+    options:{
+      ...chartDefaults(),
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>` ${c.raw} bài nộp` } } },
+      scales:{
+        x:{ grid:{display:false}, ticks:{ font:{family:"'Quicksand'",size:10}, color:'#8fa0b0', maxTicksLimit:10 } },
+        y:{ grid:{color:'rgba(111,194,233,0.1)'}, ticks:{ font:{family:"'Quicksand'",size:11}, color:'#8fa0b0', precision:0 } }
+      }
     }
+  });
+}
 
-    /* ── CHART: Activity ── */
-    function renderChartActivity() {
-      const dayMap = {};
-      const now = Date.now();
-      const days30 = 30 * 24 * 60 * 60 * 1000;
-      allRecords.forEach(r => {
-        const ts = r.timestamp;
-        if (!ts || now - ts > days30) return;
-        const d = new Date(ts).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
-        dayMap[d] = (dayMap[d] || 0) + 1;
-      });
-      const sorted = Object.entries(dayMap).sort((a, b) => a[0].localeCompare(b[0]));
-      const labels = sorted.map(e => e[0]);
-      const data = sorted.map(e => e[1]);
-
-      destroyChart('activity');
-      const ctx = document.getElementById('chart-activity').getContext('2d');
-      const grad = ctx.createLinearGradient(0, 0, 0, 220);
-      grad.addColorStop(0, 'rgba(0,113,227,.25)');
-      grad.addColorStop(1, 'rgba(0,113,227,0)');
-      charts['activity'] = new Chart(ctx, {
-        type: 'line',
-        data: { labels, datasets: [{ data, borderColor: '#0071e3', backgroundColor: grad, borderWidth: 2.5, fill: true, tension: 0.4, pointRadius: data.length < 15 ? 4 : 0, pointHoverRadius: 6, pointBackgroundColor: '#0071e3' }] },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw} bài nộp` } } },
-          scales: {
-            x: { grid: { display: false }, ticks: { font: { family: "'Plus Jakarta Sans'", size: 10 }, color: '#86868b', maxTicksLimit: 10 } },
-            y: { grid: { color: 'rgba(0,0,0,.05)' }, ticks: { font: { family: "'Plus Jakarta Sans'", size: 11 }, color: '#86868b', precision: 0 } }
-          }
-        }
-      });
+/* ── Lessons popularity ── */
+function renderChartLessonsPop() {
+  const sorted = Object.values(lessonMap).sort((a,b)=>b.count-a.count).slice(0,8);
+  const avgPcts = sorted.map(l => Math.round(l.totalPct/l.count));
+  destroyChart('lessons-pop');
+  const ctx = document.getElementById('chart-lessons-pop').getContext('2d');
+  charts['lessons-pop'] = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels: sorted.map(l => l.name.length>28?l.name.slice(0,26)+'…':l.name),
+      datasets:[
+        { label:'Số bài', data:sorted.map(l=>l.count), backgroundColor:'rgba(111,194,233,0.18)', borderColor:'#6fc2e9', borderWidth:2, borderRadius:7, borderSkipped:false, yAxisID:'y' },
+        { label:'Điểm TB%', data:avgPcts, type:'line', borderColor:'#7ec8a0', backgroundColor:'transparent', borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#7ec8a0', tension:0.35, yAxisID:'y2' }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false, indexAxis:'y',
+      plugins:{ legend:{ position:'top', labels:{ font:{family:"'Quicksand'",size:11}, usePointStyle:true, boxWidth:8 } } },
+      scales:{
+        x:{ grid:{color:'rgba(111,194,233,0.1)'}, ticks:{ font:{family:"'Quicksand'",size:10}, color:'#8fa0b0' } },
+        y:{ grid:{display:false}, ticks:{ font:{family:"'Quicksand'",size:10}, color:'#8fa0b0' } },
+        y2:{ display:false, min:0, max:100 }
+      }
     }
+  });
+}
 
-    /* ── CHART: Lessons Popularity ── */
-    function renderChartLessonsPop() {
-      const sorted = Object.values(lessonMap).sort((a, b) => b.count - a.count).slice(0, 8);
-      const labels = sorted.map(l => l.name.length > 30 ? l.name.slice(0, 28) + '…' : l.name);
-      const data = sorted.map(l => l.count);
-      const avgPcts = sorted.map(l => Math.round(l.totalPct / l.count));
-
-      destroyChart('lessons-pop');
-      const ctx = document.getElementById('chart-lessons-pop').getContext('2d');
-      charts['lessons-pop'] = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [
-            { label: 'Số bài nộp', data, backgroundColor: 'rgba(0,113,227,.15)', borderColor: '#0071e3', borderWidth: 2, borderRadius: 6, borderSkipped: false, yAxisID: 'y' },
-            { label: 'Điểm TB %', data: avgPcts, type: 'line', borderColor: '#34c759', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: '#34c759', tension: 0.3, yAxisID: 'y2' }
-          ]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false, indexAxis: 'y',
-          plugins: { legend: { position: 'top', labels: { font: { family: "'Plus Jakarta Sans'", size: 11 }, usePointStyle: true, boxWidth: 8 } } },
-          scales: {
-            x: { grid: { color: 'rgba(0,0,0,.05)' }, ticks: { font: { family: "'Plus Jakarta Sans'", size: 10 }, color: '#86868b' } },
-            y: { grid: { display: false }, ticks: { font: { family: "'Plus Jakarta Sans'", size: 10 }, color: '#86868b' } },
-            y2: { display: false, min: 0, max: 100 }
-          }
-        }
-      });
-    }
-
-    /* ── TOP STUDENTS ── */
-    function renderTopStudents() {
-      const top = Object.values(studentMap).sort((a, b) => b.avgPct - a.avgPct).slice(0, 7);
-      const rankClass = ['g1', 'g2', 'g3'];
-      const rankEmoji = ['🥇', '🥈', '🥉'];
-      const el = document.getElementById('top-students-list');
-      if (!top.length) { el.innerHTML = '<div class="empty-state"><span class="empty-icon">📭</span>Chưa có dữ liệu</div>'; return; }
-      el.innerHTML = top.map((s, i) => `
+/* ── Top Students ── */
+function renderTopStudents() {
+  const top = Object.values(studentMap).sort((a,b)=>b.avgPct-a.avgPct).slice(0,7);
+  const rc  = ['g1','g2','g3'];
+  const re  = ['🥇','🥈','🥉'];
+  const el  = document.getElementById('top-students-list');
+  if (!top.length) { el.innerHTML='<div class="empty-state"><span class="empty-icon">🌿</span>Chưa có dữ liệu</div>'; return; }
+  el.innerHTML = top.map((s,i) => `
     <div class="top-item" onclick="openStudentModal('${escHtml(s.name)}')">
-      <span class="top-rank ${rankClass[i] || 'gn'}">${rankEmoji[i] || '#' + (i + 1)}</span>
-      <div class="top-avatar">${s.name[0]?.toUpperCase() || '?'}</div>
+      <span class="top-rank ${rc[i]||'gn'}">${re[i]||'#'+(i+1)}</span>
+      <div class="top-avatar">${(s.name[0]||'?').toUpperCase()}</div>
       <div style="flex:1;min-width:0">
         <div class="top-name">${escHtml(s.name)}</div>
         <div class="top-meta">${s.testCount} bài · ✅ ${s.totalCorrect} đúng</div>
       </div>
       <div class="top-score">${s.avgPct}%</div>
-    </div>
-  `).join('');
-    }
+    </div>`).join('');
+}
 
-    /* ── STUDENTS TABLE ── */
-    function filterStudents() {
-      const q = (document.getElementById('search-students')?.value || '').toLowerCase();
-      const f = document.getElementById('filter-score')?.value || 'all';
-      const so = document.getElementById('sort-students')?.value || 'name';
+/* ── Students Table ── */
+function filterStudents() {
+  const q  = (document.getElementById('search-students')?.value||'').toLowerCase();
+  const f  = document.getElementById('filter-score')?.value||'all';
+  const so = document.getElementById('sort-students')?.value||'name';
+  let list = Object.values(studentMap);
+  if (q) list = list.filter(s=>s.name.toLowerCase().includes(q));
+  if (f==='high') list = list.filter(s=>s.avgPct>=80);
+  if (f==='mid')  list = list.filter(s=>s.avgPct>=50&&s.avgPct<80);
+  if (f==='low')  list = list.filter(s=>s.avgPct<50);
+  if (so==='name')       list.sort((a,b)=>a.name.localeCompare(b.name));
+  if (so==='avg_desc')   list.sort((a,b)=>b.avgPct-a.avgPct);
+  if (so==='avg_asc')    list.sort((a,b)=>a.avgPct-b.avgPct);
+  if (so==='tests_desc') list.sort((a,b)=>b.testCount-a.testCount);
+  filteredStudents = list;
+  currentPage = 1;
+  renderStudentsTable();
+}
 
-      let list = Object.values(studentMap);
-      if (q) list = list.filter(s => s.name.toLowerCase().includes(q));
-      if (f === 'high') list = list.filter(s => s.avgPct >= 80);
-      if (f === 'mid') list = list.filter(s => s.avgPct >= 50 && s.avgPct < 80);
-      if (f === 'low') list = list.filter(s => s.avgPct < 50);
+function renderStudentsTable() {
+  const wrap = document.getElementById('students-table-wrap');
+  const pg   = document.getElementById('students-pagination');
+  if (!Object.keys(studentMap).length) {
+    wrap.innerHTML='<div class="loading-state"><div class="spinner"></div><div class="loading-text">Vui lòng tải dữ liệu</div></div>';
+    pg.style.display='none'; return;
+  }
+  if (!filteredStudents.length) {
+    wrap.innerHTML='<div class="empty-state"><span class="empty-icon">🔍</span>Không tìm thấy học sinh nào</div>';
+    pg.style.display='none'; return;
+  }
+  const total = filteredStudents.length;
+  const pages = Math.ceil(total/ROWS_PER_PAGE);
+  const start = (currentPage-1)*ROWS_PER_PAGE;
+  const slice = filteredStudents.slice(start, start+ROWS_PER_PAGE);
 
-      if (so === 'name') list.sort((a, b) => a.name.localeCompare(b.name));
-      if (so === 'avg_desc') list.sort((a, b) => b.avgPct - a.avgPct);
-      if (so === 'avg_asc') list.sort((a, b) => a.avgPct - b.avgPct);
-      if (so === 'tests_desc') list.sort((a, b) => b.testCount - a.testCount);
+  wrap.innerHTML = `<table>
+    <thead><tr>
+      <th>#</th><th>Học sinh</th><th>Bài nộp</th>
+      <th>Câu đúng</th><th>Câu sai</th><th>Điểm TB</th><th>Đánh giá</th>
+    </tr></thead>
+    <tbody>${slice.map((s,i) => {
+      const rank    = start+i+1;
+      const badgeCls = s.avgPct>=80?'badge-success':s.avgPct>=50?'badge-warning':'badge-danger';
+      const badgeTxt = s.avgPct>=80?'🌟 Giỏi':s.avgPct>=50?'🌿 Tốt':'💪 Cần cố';
+      const fill    = s.avgPct>=80?'var(--success)':s.avgPct>=50?'var(--warning)':'var(--danger)';
+      return `<tr onclick="openStudentModal('${escHtml(s.name)}')">
+        <td style="color:var(--muted);font-size:.76rem">${rank}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:.55rem">
+            <div class="top-avatar" style="width:26px;height:26px;font-size:.65rem">${(s.name[0]||'?').toUpperCase()}</div>
+            ${escHtml(s.name)}
+          </div>
+        </td>
+        <td>${s.testCount}</td>
+        <td style="color:var(--success);font-weight:700">${s.totalCorrect}</td>
+        <td style="color:var(--danger);font-weight:700">${s.totalWrong}</td>
+        <td>
+          <div class="pct-bar">
+            <div class="pct-track"><div class="pct-fill" style="width:${s.avgPct}%;background:${fill}"></div></div>
+            <span class="pct-num" style="color:${fill}">${s.avgPct}%</span>
+          </div>
+        </td>
+        <td><span class="badge ${badgeCls}">${badgeTxt}</span></td>
+      </tr>`;
+    }).join('')}</tbody></table>`;
 
-      filteredStudents = list;
-      currentPage = 1;
-      renderStudentsTable();
-    }
+  pg.style.display='flex';
+  document.getElementById('page-info-students').textContent = `Hiển thị ${start+1}–${Math.min(start+ROWS_PER_PAGE,total)} / ${total} học sinh`;
+  const btns = document.getElementById('page-btns-students');
+  let h = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+  for (let p=1;p<=pages;p++) {
+    if (pages>7&&p>2&&p<pages-1&&Math.abs(p-currentPage)>1) { if(p===3||p===pages-2) h+='<span style="padding:0 .25rem;color:var(--muted)">…</span>'; continue; }
+    h+=`<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
+  }
+  h+=`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>›</button>`;
+  btns.innerHTML = h;
+}
 
-    function renderStudentsTable() {
-      const wrap = document.getElementById('students-table-wrap');
-      const pg = document.getElementById('students-pagination');
+function goPage(p) {
+  const pages = Math.ceil(filteredStudents.length/ROWS_PER_PAGE);
+  if (p<1||p>pages) return;
+  currentPage = p;
+  renderStudentsTable();
+  document.getElementById('students-table-wrap').scrollIntoView({behavior:'smooth',block:'start'});
+}
 
-      if (!Object.keys(studentMap).length) {
-        wrap.innerHTML = '<div class="loading-state"><div class="spinner"></div><div class="loading-text">Vui lòng tải dữ liệu</div></div>';
-        pg.style.display = 'none'; return;
-      }
-      if (!filteredStudents.length) {
-        wrap.innerHTML = '<div class="empty-state"><span class="empty-icon">🔍</span>Không tìm thấy học sinh nào</div>';
-        pg.style.display = 'none'; return;
-      }
+/* ── Grammar Grid ── */
+function setGrammarSort(sort, btn) {
+  grammarSort = sort;
+  document.querySelectorAll('#grammar-filter-chips .chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrammarGrid();
+}
 
-      const total = filteredStudents.length;
-      const pages = Math.ceil(total / ROWS_PER_PAGE);
-      const start = (currentPage - 1) * ROWS_PER_PAGE;
-      const slice = filteredStudents.slice(start, start + ROWS_PER_PAGE);
-
-      wrap.innerHTML = `
-    <table>
-      <thead><tr>
-        <th>#</th>
-        <th>Học sinh</th>
-        <th>Bài nộp</th>
-        <th>Câu đúng</th>
-        <th>Câu sai</th>
-        <th>Điểm TB</th>
-        <th>Đánh giá</th>
-      </tr></thead>
-      <tbody>
-        ${slice.map((s, i) => {
-        const rank = start + i + 1;
-        const badgeCls = s.avgPct >= 80 ? 'badge-success' : s.avgPct >= 50 ? 'badge-warning' : 'badge-danger';
-        const badgeTxt = s.avgPct >= 80 ? '🏆 Giỏi' : s.avgPct >= 50 ? '👍 Tốt' : '💪 Cần cố';
-        const fillColor = s.avgPct >= 80 ? 'var(--success)' : s.avgPct >= 50 ? 'var(--warning)' : 'var(--danger)';
-        return `<tr onclick="openStudentModal('${escHtml(s.name)}')">
-            <td style="color:var(--muted);font-size:.78rem">${rank}</td>
-            <td>
-              <div style="display:flex;align-items:center;gap:.6rem">
-                <div class="top-avatar" style="width:28px;height:28px;font-size:.7rem">${s.name[0]?.toUpperCase() || '?'}</div>
-                ${escHtml(s.name)}
-              </div>
-            </td>
-            <td>${s.testCount}</td>
-            <td style="color:var(--success);font-weight:700">${s.totalCorrect}</td>
-            <td style="color:var(--danger);font-weight:700">${s.totalWrong}</td>
-            <td>
-              <div class="pct-bar">
-                <div class="pct-track"><div class="pct-fill" style="width:${s.avgPct}%;background:${fillColor}"></div></div>
-                <span class="pct-num" style="color:${fillColor}">${s.avgPct}%</span>
-              </div>
-            </td>
-            <td><span class="badge ${badgeCls}">${badgeTxt}</span></td>
-          </tr>`;
-      }).join('')}
-      </tbody>
-    </table>
-  `;
-
-      // Pagination
-      pg.style.display = 'flex';
-      document.getElementById('page-info-students').textContent = `Hiển thị ${start + 1}–${Math.min(start + ROWS_PER_PAGE, total)} / ${total} học sinh`;
-      const btns = document.getElementById('page-btns-students');
-      let pHtml = `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
-      for (let p = 1; p <= pages; p++) {
-        if (pages > 7 && p > 2 && p < pages - 1 && Math.abs(p - currentPage) > 1) { if (p === 3 || p === pages - 2) pHtml += '<span style="padding:0 .3rem;color:var(--muted)">…</span>'; continue; }
-        pHtml += `<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="goPage(${p})">${p}</button>`;
-      }
-      pHtml += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === pages ? 'disabled' : ''}>›</button>`;
-      btns.innerHTML = pHtml;
-    }
-
-    function goPage(p) {
-      const pages = Math.ceil(filteredStudents.length / ROWS_PER_PAGE);
-      if (p < 1 || p > pages) return;
-      currentPage = p;
-      renderStudentsTable();
-      document.getElementById('students-table-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    /* ── GRAMMAR GRID ── */
-    function setGrammarSort(sort, btn) {
-      grammarSort = sort;
-      document.querySelectorAll('#grammar-filter-chips .chip').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-      renderGrammarGrid();
-    }
-
-    function renderGrammarGrid() {
-      const el = document.getElementById('grammar-grid');
-      let items = Object.values(grammarMap);
-      if (!items.length) {
-        el.innerHTML = '<div class="loading-state"><div class="spinner"></div><div class="loading-text">Vui lòng tải dữ liệu</div></div>';
-        return;
-      }
-
-      items.forEach(g => { g.total = g.correct + g.wrong; g.pct = g.total > 0 ? Math.round((g.correct / g.total) * 100) : 0; });
-      if (grammarSort === 'pct_asc') items.sort((a, b) => a.pct - b.pct);
-      if (grammarSort === 'pct_desc') items.sort((a, b) => b.pct - a.pct);
-      if (grammarSort === 'count_desc') items.sort((a, b) => b.total - a.total);
-
-      el.innerHTML = `<div class="grammar-grid">${items.map(g => {
-        const color = g.pct >= 80 ? 'var(--success)' : g.pct >= 50 ? 'var(--warning)' : 'var(--danger)';
-        return `<div class="grammar-chip">
+function renderGrammarGrid() {
+  const el = document.getElementById('grammar-grid');
+  let items = Object.values(grammarMap);
+  if (!items.length) {
+    el.innerHTML='<div class="loading-state"><div class="spinner"></div><div class="loading-text">Vui lòng tải dữ liệu</div></div>'; return;
+  }
+  items.forEach(g => { g.total=g.correct+g.wrong; g.pct=g.total>0?Math.round((g.correct/g.total)*100):0; });
+  if (grammarSort==='pct_asc')    items.sort((a,b)=>a.pct-b.pct);
+  if (grammarSort==='pct_desc')   items.sort((a,b)=>b.pct-a.pct);
+  if (grammarSort==='count_desc') items.sort((a,b)=>b.total-a.total);
+  el.innerHTML = `<div class="grammar-grid">${items.map(g=>{
+    const color = g.pct>=80?'var(--success)':g.pct>=50?'var(--warning)':'var(--danger)';
+    return `<div class="grammar-chip">
       <div class="grammar-name" title="${escHtml(g.tag)}">${escHtml(g.tag)}</div>
       <div class="grammar-bar-track"><div class="grammar-bar-fill" style="width:${g.pct}%;background:${color}"></div></div>
       <div class="grammar-stats-row">
@@ -2007,126 +1121,135 @@
         <span class="grammar-count">✅${g.correct} ❌${g.wrong} · ${g.total} câu</span>
       </div>
     </div>`;
-      }).join('')}</div>`;
-    }
+  }).join('')}</div>`;
+}
 
-    /* ── LESSONS TABLE ── */
-    function filterLessons() {
-      const q = (document.getElementById('search-lessons')?.value || '').toLowerCase();
-      renderLessonsTable(q);
-    }
+/* ── Lessons Table ── */
+function filterLessons() { renderLessonsTable((document.getElementById('search-lessons')?.value||'').toLowerCase()); }
 
-    function renderLessonsTable(q = '') {
-      const wrap = document.getElementById('lessons-table-wrap');
-      let items = Object.values(lessonMap);
+function renderLessonsTable(q='') {
+  const wrap = document.getElementById('lessons-table-wrap');
+  let items = Object.values(lessonMap);
+  if (!items.length) { wrap.innerHTML='<div class="loading-state"><div class="spinner"></div><div class="loading-text">Vui lòng tải dữ liệu</div></div>'; return; }
+  if (q) items = items.filter(l=>l.name.toLowerCase().includes(q));
+  items.sort((a,b)=>b.count-a.count);
+  wrap.innerHTML = `<table>
+    <thead><tr><th>Bài học</th><th>Lượt làm</th><th>Tổng đúng</th><th>Tổng sai</th><th>Điểm TB</th><th>Độ khó</th></tr></thead>
+    <tbody>${items.map(l=>{
+      const avg  = Math.round(l.totalPct/l.count);
+      const fill = avg>=80?'var(--success)':avg>=50?'var(--warning)':'var(--danger)';
+      const diff = avg>=80?'🟢 Dễ':avg>=60?'🟡 Trung bình':avg>=40?'🟠 Khó':'🔴 Rất khó';
+      return `<tr>
+        <td style="max-width:280px;white-space:normal;line-height:1.35">${escHtml(l.name)}</td>
+        <td style="font-weight:700">${l.count}</td>
+        <td style="color:var(--success);font-weight:700">${l.correct}</td>
+        <td style="color:var(--danger);font-weight:700">${l.wrong}</td>
+        <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:${avg}%;background:${fill}"></div></div><span class="pct-num" style="color:${fill}">${avg}%</span></div></td>
+        <td><span style="font-size:.78rem;font-weight:700">${diff}</span></td>
+      </tr>`;
+    }).join('')}</tbody></table>`;
+}
 
-      if (!items.length) {
-        wrap.innerHTML = '<div class="loading-state"><div class="spinner"></div><div class="loading-text">Vui lòng tải dữ liệu</div></div>';
-        return;
-      }
+/* ════════════════════════════════════════════
+   STUDENT DETAIL MODAL
+════════════════════════════════════════════ */
+function openStudentModal(name) {
+  const s = studentMap[name];
+  if (!s) return;
+  modalStudentName  = name;
+  modalActivelesson = 'all';
 
-      if (q) items = items.filter(l => l.name.toLowerCase().includes(q));
-      items.sort((a, b) => b.count - a.count);
+  document.getElementById('modal-avatar').textContent = (name[0]||'?').toUpperCase();
+  document.getElementById('modal-name').textContent   = name;
+  document.getElementById('modal-meta').textContent   = `${s.testCount} bài nộp · Điểm TB ${s.avgPct}%`;
 
-      wrap.innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>Bài học</th>
-          <th style="text-align:center">Lượt làm</th>
-          <th>Tổng đúng</th>
-          <th>Tổng sai</th>
-          <th>Điểm TB</th>
-          <th>Độ khó</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${items.map(l => {
-        const avg = Math.round(l.totalPct / l.count);
-        const fill = avg >= 80 ? 'var(--success)' : avg >= 50 ? 'var(--warning)' : 'var(--danger)';
-        const diffLabel = avg >= 80 ? 'Dễ' : avg >= 60 ? 'T.Bình' : avg >= 40 ? 'Khó' : 'Rất khó';
-        const diffColor = avg >= 80 ? 'badge-success' : avg >= 60 ? 'badge-warning' : 'badge-danger';
-
-        // Tạo danh sách học viên để hiện khi hover (Tooltip)
-        // l.students là mảng thầy vừa push vào ở hàm processData
-        const studentList = l.students && l.students.length > 0
-          ? `Học viên: ${l.students.join(', ')}`
-          : 'Chưa có dữ liệu học viên';
-
-        return `
-            <tr>
-              <td style="max-width:280px; white-space:normal; line-height:1.4; font-weight:600">
-                ${escHtml(l.name)}
-              </td>
-              <td style="text-align:center">
-                <span class="nav-badge" 
-                      style="background: var(--accent-light); color: var(--accent); cursor: help; padding: 0.3rem 0.6rem; font-size: 0.75rem" 
-                      data-tooltip="${escHtml(studentList)}">
-                  ${l.count} 👤
-                </span>
-              </td>
-              <td style="color:var(--success); font-weight:700">${l.correct}</td>
-              <td style="color:var(--danger); font-weight:700">${l.wrong}</td>
-              <td>
-                <div class="pct-bar">
-                  <div class="pct-track"><div class="pct-fill" style="width:${avg}%; background:${fill}"></div></div>
-                  <span class="pct-num" style="color:${fill}">${avg}%</span>
-                </div>
-              </td>
-              <td>
-                <span class="badge ${diffColor}" style="font-size: 0.65rem; min-width: 60px; justify-content: center">
-                  ${diffLabel}
-                </span>
-              </td>
-            </tr>`;
-      }).join('')}
-      </tbody>
-    </table>
-  `;
-    }
-
-    /* ═══════════════════════════════════════════════
-       STUDENT DETAIL MODAL
-    ═══════════════════════════════════════════════ */
-    function openStudentModal(name) {
-      const s = studentMap[name];
-      if (!s) return;
-
-      document.getElementById('modal-avatar').textContent = name[0]?.toUpperCase() || '?';
-      document.getElementById('modal-name').textContent = name;
-      document.getElementById('modal-meta').textContent = `${s.testCount} bài nộp · Điểm TB ${s.avgPct}%`;
-
-      // Mini stats
-      const badgeColor = s.avgPct >= 80 ? 'var(--success)' : s.avgPct >= 50 ? 'var(--warning)' : 'var(--danger)';
-      document.getElementById('modal-stats').innerHTML = `
-    <div class="mstat"><div class="mstat-val" style="color:var(--accent)">${s.testCount}</div><div class="mstat-lbl">Bài nộp</div></div>
+  // Stats
+  const bc = s.avgPct>=80?'var(--success)':s.avgPct>=50?'var(--warning)':'var(--danger)';
+  document.getElementById('modal-stats').innerHTML = `
+    <div class="mstat"><div class="mstat-val" style="color:var(--sky-blue-dark)">${s.testCount}</div><div class="mstat-lbl">Bài nộp</div></div>
     <div class="mstat"><div class="mstat-val" style="color:var(--success)">${s.totalCorrect}</div><div class="mstat-lbl">Câu đúng</div></div>
     <div class="mstat"><div class="mstat-val" style="color:var(--danger)">${s.totalWrong}</div><div class="mstat-lbl">Câu sai</div></div>
-    <div class="mstat"><div class="mstat-val" style="color:${badgeColor}">${s.avgPct}%</div><div class="mstat-lbl">Điểm TB</div></div>
-  `;
+    <div class="mstat"><div class="mstat-val" style="color:${bc}">${s.avgPct}%</div><div class="mstat-lbl">Điểm TB</div></div>`;
 
-      // Sessions
-      const sessHtml = s.records.map((r, i) => {
-        const emoji = r.pct >= 80 ? '🏆' : r.pct >= 50 ? '👍' : '💪';
-        const sc = r.pct >= 80 ? 'var(--success)' : r.pct >= 50 ? 'var(--warning)' : 'var(--danger)';
-        const qHtml = r.answers.map((ans, qi) => {
-          const qText = Array.isArray(ans.q?.q) ? ans.q.q.join(' ') : (ans.q?.q || '');
-          return `<div class="q-row ${ans.correct ? 'correct' : 'wrong'}">
-        <span class="q-badge ${ans.correct ? 'c' : 'w'}">${ans.correct ? 'Đúng' : 'Sai'}</span>
+  // Build lesson tabs
+  const lessons = [...new Set(s.records.map(r=>r.lessonName))];
+  const tabsEl  = document.getElementById('lesson-tabs');
+  tabsEl.innerHTML = `<button class="lesson-tab active" onclick="selectLesson('all',this)">📋 Tất cả (${s.records.length})</button>` +
+    lessons.map(ln => {
+      const cnt  = s.records.filter(r=>r.lessonName===ln).length;
+      const short = ln.length>30 ? ln.slice(0,28)+'…' : ln;
+      return `<button class="lesson-tab" title="${escHtml(ln)}" onclick="selectLesson('${escHtml(ln)}',this)">🍃 ${escHtml(short)} (${cnt})</button>`;
+    }).join('');
+
+  renderModalBody();
+  document.getElementById('modal-student').classList.add('open');
+}
+
+function selectLesson(lessonName, btn) {
+  modalActivelesson = lessonName;
+  document.querySelectorAll('.lesson-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderModalBody();
+}
+
+function renderModalBody() {
+  const s = studentMap[modalStudentName];
+  if (!s) return;
+
+  // Filter records
+  const records = modalActivelesson === 'all'
+    ? s.records
+    : s.records.filter(r => r.lessonName === modalActivelesson);
+
+  const body = document.getElementById('modal-body');
+
+  if (!records.length) {
+    body.innerHTML = '<div class="empty-state"><span class="empty-icon">🌿</span>Chưa có bài làm nào cho bài học này</div>';
+    return;
+  }
+
+  // Progress insight for selected lesson (if specific lesson selected)
+  let insightHtml = '';
+  if (modalActivelesson !== 'all' && records.length > 1) {
+    const sorted = [...records].sort((a,b)=>(a.timestamp||0)-(b.timestamp||0));
+    const items = sorted.map((r,i) => {
+      const color = r.pct>=80?'var(--success)':r.pct>=50?'var(--warning)':'var(--danger)';
+      return `<div class="lp-item">
+        <div class="lp-dot" style="background:${color}"></div>
+        <span>Lần ${i+1}: <strong style="color:${color}">${r.pct}%</strong></span>
+      </div>`;
+    }).join('');
+    const first = sorted[0].pct; const last = sorted[sorted.length-1].pct;
+    const diff  = last - first;
+    const trend = diff > 0 ? `📈 Tiến bộ +${diff}%` : diff < 0 ? `📉 Giảm ${Math.abs(diff)}%` : '➡️ Ổn định';
+    insightHtml = `
+      <div class="lesson-progress-bar">
+        <div class="lp-title">📊 Tiến trình qua ${records.length} lần làm · ${trend}</div>
+        <div class="lp-items">${items}</div>
+      </div>`;
+  }
+
+  const sessHtml = records.map((r,i) => {
+    const emoji = r.pct>=80?'🌟':r.pct>=50?'🌿':'💪';
+    const sc    = r.pct>=80?'var(--success)':r.pct>=50?'var(--warning)':'var(--danger)';
+    const qHtml = r.answers.map((ans,qi) => {
+      const qText = Array.isArray(ans.q?.q) ? ans.q.q.join(' ') : (ans.q?.q||'');
+      return `<div class="q-row ${ans.correct?'correct':'wrong'}">
+        <span class="q-badge ${ans.correct?'c':'w'}">${ans.correct?'Đúng':'Sai'}</span>
         <div class="q-content">
           <div class="q-text">${escHtml(qText)}</div>
-          <div class="q-ans">Trả lời: <strong style="color:${ans.correct ? 'var(--success)' : 'var(--danger)'}">${escHtml(ans.userAns || '(Bỏ trống)')}</strong>${!ans.correct ? ` · Đúng: <strong style="color:var(--success)">${escHtml(ans.q?.a || '')}</strong>` : ''}</div>
-          ${(!ans.correct && ans.q?.lesson) ? `<div style="font-size:.65rem;color:var(--purple);margin-top:.1rem">📚 ${escHtml(ans.q.lesson)}</div>` : ''}
+          <div class="q-ans">Trả lời: <strong style="color:${ans.correct?'var(--success)':'var(--danger)'}">${escHtml(ans.userAns||'(Bỏ trống)')}</strong>${!ans.correct?` · Đáp án: <strong style="color:var(--success)">${escHtml(ans.q?.a||'')}</strong>`:''}</div>
+          ${(!ans.correct&&ans.q?.lesson)?`<div style="font-size:.63rem;color:var(--lavender);margin-top:.1rem">📖 ${escHtml(ans.q.lesson)}</div>`:''}
         </div>
       </div>`;
-        }).join('');
-
-        return `<div class="session-item" id="ms-${i}">
+    }).join('');
+    const lessonShort = r.lessonName.length>50 ? r.lessonName.slice(0,48)+'…' : r.lessonName;
+    return `<div class="session-item" id="ms-${i}">
       <div class="session-head" onclick="toggleSession(${i})">
         <span class="session-emoji">${emoji}</span>
         <div class="session-info">
-          <div class="session-lesson">${escHtml(r.lessonName.length > 50 ? r.lessonName.slice(0, 48) + '…' : r.lessonName)}</div>
-          <div class="session-meta-row">🕐 ${r.date} · ✅ ${r.score} đúng · ❌ ${r.total - r.score} sai</div>
+          <div class="session-lesson">${escHtml(lessonShort)}</div>
+          <div class="session-meta-row">🕐 ${r.date} · ✅ ${r.score} đúng · ❌ ${r.total-r.score} sai</div>
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div class="session-pct" style="color:${sc}">${r.pct}%</div>
@@ -2134,41 +1257,28 @@
         </div>
         <span class="session-chevron">▾</span>
       </div>
-      <div class="session-questions">${qHtml || '<div style="text-align:center;padding:.75rem;color:var(--muted);font-size:.8rem">Không có dữ liệu chi tiết</div>'}</div>
+      <div class="session-questions">${qHtml||'<div style="text-align:center;padding:.6rem;color:var(--muted);font-size:.78rem">Không có dữ liệu chi tiết</div>'}</div>
     </div>`;
-      }).join('');
+  }).join('');
 
-      document.getElementById('modal-body').innerHTML = `
-    <div class="modal-section-title">Lịch sử bài làm</div>
-    ${sessHtml}
-  `;
+  body.innerHTML = insightHtml + `<div class="modal-section-title" style="margin-top:${insightHtml?'.8rem':'0'}">Lịch sử bài làm</div>` + sessHtml;
 
-      document.getElementById('modal-student').classList.add('open');
-    }
+  // Auto-expand first session
+  if (records.length) toggleSession(0);
+}
 
-    function toggleSession(i) {
-      document.getElementById('ms-' + i)?.classList.toggle('expanded');
-    }
+function toggleSession(i) {
+  document.getElementById('ms-'+i)?.classList.toggle('expanded');
+}
 
-    function closeModal(e) {
-      if (e.target.id === 'modal-student') closeModalDirect();
-    }
-    function closeModalDirect() {
-      document.getElementById('modal-student').classList.remove('open');
-    }
+function closeModal(e) { if(e.target.id==='modal-student') closeModalDirect(); }
+function closeModalDirect() { document.getElementById('modal-student').classList.remove('open'); }
 
-    /* ═══════════════════════════════════════════════
-       UTILITIES
-    ═══════════════════════════════════════════════ */
-    function destroyChart(key) {
-      if (charts[key]) { charts[key].destroy(); delete charts[key]; }
-    }
-
-    function escHtml(str) {
-      if (!str) return '';
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-  </script>
+/* ── Utility ── */
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+</script>
 </body>
-
 </html>
