@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -1306,10 +1305,28 @@
     }
 
     .q-lesson-ref {
-      font-size: .63rem;
-      color: var(--lavender);
-      margin-top: .18rem;
-      font-style: italic;
+      display: block;
+      /* Chuyển sang block để chiếm trọn chiều ngang cho thoáng */
+      font-size: 0.95rem;
+      /* Tăng nhẹ size để đọc cực rõ trên mobile */
+      color: #4b5563;
+      /* Màu xám chì (Slate 600), đủ đậm để đọc nhưng không bị gắt như đen */
+      background: #f3f4f6;
+      /* Nền xám khói rất nhẹ (Gray 100) */
+      margin-top: 1.2rem;
+      /* Khoảng cách rộng rãi để không dính với câu trả lời */
+      padding: 1rem 1.2rem;
+      /* Padding lớn hơn để chữ có không gian "thở" */
+      border-radius: 12px;
+      /* Bo góc đồng bộ với Card tổng thể */
+      font-style: normal;
+      /* Bỏ italic để trông hiện đại và gọn gàng hơn */
+      font-weight: 500;
+      line-height: 1.5;
+      border-left: 4px solid #111827;
+      /* Đường kẻ trái đen tuyền làm điểm nhấn quyền lực */
+      letter-spacing: -0.01em;
+      /* Giãn chữ hơi khít lại một chút cho chuyên nghiệp */
     }
 
     .session-info {
@@ -1369,21 +1386,51 @@
 
     .q-row {
       display: flex;
-      gap: .55rem;
-      padding: .45rem .55rem;
-      border-radius: var(--radius-xs);
-      margin-bottom: .35rem;
-      font-size: .74rem;
+      gap: 1.2rem;
+      /* Tăng khoảng cách giữa số câu và nội dung */
+      padding: 1.5rem;
+      /* Padding rộng rãi cho đúng chất Luxury */
+      border-radius: 20px;
+      /* Bo góc lớn nhìn hiện đại và mềm mại */
+      margin-bottom: 1.2rem;
+      /* Tạo khoảng cách giữa các câu hỏi */
+      font-size: 1.1rem;
+      /* Font chữ chính phải to, rõ ràng */
+      background: #ffffff;
+      /* Nền trắng sạch sẽ */
+      border: 1px solid #f2f4f7;
+      /* Viền mờ để định hình khối */
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      /* Đổ bóng cực nhẹ tạo độ nổi */
+      transition: all 0.2s ease;
     }
 
+    /* Khi câu trả lời ĐÚNG */
     .q-row.correct {
-      background: rgba(90, 171, 130, 0.08);
-      border-left: 2.5px solid rgba(90, 171, 130, 0.4);
+      background: #ffffff;
+      border-left: 5px solid #101828;
+      /* Dùng màu đen hoặc xám đậm cho Clean */
+      /* Nếu bạn vẫn muốn một chút màu xanh cho dễ phân biệt thì dùng mã dưới: */
+      /* border-left: 5px solid #039855; */
     }
 
+    /* Khi câu trả lời SAI */
     .q-row.wrong {
-      background: rgba(224, 112, 112, 0.07);
-      border-left: 2.5px solid rgba(224, 112, 112, 0.35);
+      background: #fcfcfc;
+      /* Hơi xám một chút để phân biệt với câu đúng */
+      border-left: 5px solid #d1d5db;
+      /* Màu xám nhạt trung tính */
+      /* Nếu muốn màu đỏ nhẹ tinh tế: */
+      /* border-left: 5px solid #d92d20; */
+    }
+
+    /* Tăng kích cỡ số thứ tự câu hỏi */
+    .q-num {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #98a2b3;
+      /* Màu xám nhạt cho số thứ tự để không lấn át câu hỏi */
+      min-width: 28px;
     }
 
     .q-badge {
